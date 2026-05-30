@@ -458,6 +458,30 @@
             cursor: pointer; font-weight: 600; transition: all 0.15s; font-family: var(--font-family);
         }
         .guide-btn:active { transform: scale(0.97); opacity: 0.9; }
+
+        /* --- 预约弹窗 --- */
+        .booking-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            padding: 16px; animation: fadeIn 0.2s ease;
+        }
+        .booking-overlay.show { display: flex; }
+        .booking-modal {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;
+            padding: 20px; box-shadow: var(--shadow-xl);
+        }
+        .booking-modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .booking-modal-title { font-size: 17px; font-weight: 700; }
+        .booking-modal-close {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: var(--color-bg-light); cursor: pointer; font-size: 18px;
+        }
+        .booking-modal-close:active { background: var(--color-border); }
     </style>
 </head>
 <body>
@@ -480,6 +504,42 @@
         <div class="sos-text">紧急呼叫已发送</div>
         <div class="sos-desc">物业人员正在赶来，请保持电话畅通</div>
         <button class="sos-cancel" onclick="closeSOSOverlay()">取消呼叫</button>
+    </div>
+
+    <!-- 医生预约弹窗 -->
+    <div class="booking-overlay" id="bookingOverlay">
+        <div class="booking-modal">
+            <div class="booking-modal-header">
+                <div class="booking-modal-title" id="bookingTitle">预约医生</div>
+                <div class="booking-modal-close" onclick="closeBookingOverlay()">✕</div>
+            </div>
+            <div class="form-row">
+                <label class="form-label">预约日期</label>
+                <input type="date" class="form-input" id="docDate">
+            </div>
+            <div class="form-row">
+                <label class="form-label">预约时间</label>
+                <select class="form-select" id="docTime">
+                    <option value="08:00-10:00">08:00-10:00</option>
+                    <option value="10:00-12:00">10:00-12:00</option>
+                    <option value="14:00-16:00">14:00-16:00</option>
+                    <option value="16:00-18:00">16:00-18:00</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label class="form-label">居民姓名</label>
+                <input type="text" class="form-input" id="docName" value="李明华">
+            </div>
+            <div class="form-row">
+                <label class="form-label">联系电话</label>
+                <input type="tel" class="form-input" id="docPhone" value="13812345678">
+            </div>
+            <div class="form-row">
+                <label class="form-label">症状描述</label>
+                <textarea class="form-textarea" id="docSymptom" placeholder="请简要描述症状或就诊需求"></textarea>
+            </div>
+            <button class="submit-btn" onclick="submitDoctorAppointment()">提交预约</button>
+        </div>
     </div>
 
     <!-- ========== 首页 ========== -->
@@ -1099,25 +1159,56 @@
             `).join('');
         }
 
-        async function bookDoctor(doctorId, doctorName) {
-            const date = prompt('请输入预约日期（如 2026-06-01）：');
-            if (!date) return;
-            const time = prompt('请输入预约时间（如 09:00）：');
-            if (!time) return;
-            const online = await checkBackend();
+        // 当前预约的医生信息
+        var currentBookingDoctor = { id: null, name: '' };
+
+        function openBookingOverlay(doctorId, doctorName) {
+            currentBookingDoctor = { id: doctorId, name: doctorName };
+            document.getElementById('bookingTitle').textContent = '预约 ' + doctorName;
+            // 默认日期设为明天
+            var tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('docDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('docTime').value = '08:00-10:00';
+            document.getElementById('bookingOverlay').classList.add('show');
+        }
+
+        function closeBookingOverlay() {
+            document.getElementById('bookingOverlay').classList.remove('show');
+            currentBookingDoctor = { id: null, name: '' };
+        }
+
+        async function submitDoctorAppointment() {
+            var date = document.getElementById('docDate').value;
+            var time = document.getElementById('docTime').value;
+            var name = document.getElementById('docName').value.trim();
+            var phone = document.getElementById('docPhone').value.trim();
+            var symptom = document.getElementById('docSymptom').value.trim();
+            if (!date) { showH5Toast('请选择预约日期', 'error'); return; }
+            if (!name) { showH5Toast('请填写居民姓名', 'error'); return; }
+            if (!phone) { showH5Toast('请填写联系电话', 'error'); return; }
+            var online = await checkBackend();
             if (!online) { showH5Toast('后端未连接', 'info'); return; }
-            const data = {
-                doctor_id: doctorId,
-                doctor_name: doctorName,
-                resident_name: '李明华',
-                resident_phone: '13812345678',
+            var data = {
+                doctor_id: currentBookingDoctor.id,
+                doctor_name: currentBookingDoctor.name,
+                resident_name: name,
+                resident_phone: phone,
                 appointment_date: date,
                 appointment_time: time,
-                symptom: ''
+                symptom: symptom
             };
-            const res = await api('api/community/doctors/appointments', { method: 'POST', body: JSON.stringify(data) });
-            if (res && res.code === 0) { showH5Toast('预约成功！', 'success'); }
-            else { showH5Toast('预约失败，请重试', 'error'); }
+            var res = await api('api/community/doctors/appointments', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) {
+                showH5Toast('预约成功！', 'success');
+                closeBookingOverlay();
+            } else {
+                showH5Toast('预约失败，请重试', 'error');
+            }
+        }
+
+        async function bookDoctor(doctorId, doctorName) {
+            openBookingOverlay(doctorId, doctorName);
         }
 
         // ========== 退出登录 ==========
