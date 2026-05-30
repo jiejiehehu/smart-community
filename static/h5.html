@@ -719,6 +719,20 @@
             </div>
             <button class="logout-btn" onclick="logout()">退出登录</button>
         </div>
+
+        <!-- 社区医生页面 -->
+        <div class="page" id="page-doctor">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-back" onclick="showPage('home')">‹</div>
+                    <div class="header-title">社区医生</div>
+                    <div style="width:32px;"></div>
+                </div>
+            </div>
+            <div class="doctor-list" id="doctorList">
+                <!-- 医生列表由 JS 动态加载 -->
+            </div>
+        </div>
     </div>
 
     <!-- 底部 Tab 栏 -->
@@ -1132,19 +1146,5 @@
         checkBackend();
         setTimeout(() => { loadHomeData(); }, 500);
     </script>
-
-            <!-- 社区医生页面 -->
-            <div class="page" id="page-doctor">
-                <div class="header">
-                    <div class="header-top">
-                        <div class="header-back" onclick="showPage('home')">‹</div>
-                        <div class="header-title">社区医生</div>
-                        <div style="width:32px;"></div>
-                    </div>
-                </div>
-                <div class="doctor-list" id="doctorList">
-                    <!-- 医生列表由 JS 动态加载 -->
-                </div>
-            </div>
 </body>
 </html>
