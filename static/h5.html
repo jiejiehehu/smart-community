@@ -729,21 +729,21 @@
                 <div class="msg-tab" onclick="switchMsgTab(this,'system')">系统消息</div>
             </div>
             <div class="msg-list">
-                <div class="msg-item">
+                <div class="msg-item" data-type="fee">
                     <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);">💰</div>
                     <div class="msg-content">
                         <div class="msg-title">物业费待缴费提醒 <span class="msg-time">今天</span></div>
                         <div class="msg-desc">您2026年5月的物业费298元待缴纳，请及时处理。</div>
                     </div>
                 </div>
-                <div class="msg-item">
+                <div class="msg-item" data-type="repair">
                     <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);">🔧</div>
                     <div class="msg-content">
                         <div class="msg-title">报修进度更新 <span class="msg-time">昨天</span></div>
                         <div class="msg-desc">您的卫生间水管报修已派单，维修师傅将于明天上门。</div>
                     </div>
                 </div>
-                <div class="msg-item">
+                <div class="msg-item" data-type="activity">
                     <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);">🎉</div>
                     <div class="msg-content">
                         <div class="msg-title">社区活动通知 <span class="msg-time">3天前</span></div>
@@ -908,6 +908,9 @@
         function switchMsgTab(el, type) {
             document.querySelectorAll('.msg-tab').forEach(e => e.classList.remove('active'));
             el.classList.add('active');
+            document.querySelectorAll('.msg-item').forEach(item => {
+                item.style.display = (type === 'all' || item.dataset.type === type) ? '' : 'none';
+            });
         }
 
         // ========== SOS ==========
