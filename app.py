@@ -99,23 +99,24 @@ def init_db():
             staff_name TEXT,
             completed_at TEXT,
             rating INTEGER,
-            review TEXT
+            review TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
         ''')
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS canteen_orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_no TEXT UNIQUE NOT NULL,
-            customer_name TEXT NOT NULL,
-            customer_phone TEXT,
-            dishes TEXT NOT NULL,
-            meal_type TEXT,
-            amount REAL NOT NULL,
-            status TEXT DEFAULT 'pending',
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            completed_at TEXT,
-            remark TEXT
-        )
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS canteen_orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_no TEXT UNIQUE NOT NULL,
+        customer_name TEXT NOT NULL,
+        customer_phone TEXT,
+        dishes TEXT NOT NULL,
+        meal_type TEXT,
+        amount REAL NOT NULL,
+        status TEXT DEFAULT 'pending',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        completed_at TEXT,
+        remark TEXT
+    )
     ''')
     
     cursor.execute('''
@@ -492,6 +493,12 @@ def init_db():
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )''')
         # 检查是否已有数据
+    # 兼容性处理：为旧数据库添加缺失的列
+    try:
+        cursor.execute("ALTER TABLE health_orders ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP")
+    except:
+        pass  # 列已存在
+    
     cursor.execute('SELECT COUNT(*) FROM housekeeping_orders')
     if cursor.fetchone()[0] == 0:
         init_mock_data(conn)
@@ -1145,6 +1152,43 @@ def init_mock_data(conn):
             INSERT INTO community_consultations (doctor_id, doctor_name, resident_name, resident_phone, consult_date, consult_time, symptom, doctor_reply, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (*con[:7], con[7], con[8]))
+    
+    # ============ 健康服务订单模拟数据 ============
+    health_services = [
+        ('体检', '常规体检'),
+        ('按摩', '穴位按摩'),
+        ('理疗', '物理治疗'),
+        ('健康咨询', '营养师咨询'),
+    ]
+    ht_customers = [
+        ('张大爷', '138****1111', '碧水园1栋201'),
+        ('李奶奶', '138****2222', '翠湖居2栋305'),
+        ('王叔叔', '138****3333', '怡景苑3栋102'),
+        ('赵阿姨', '138****4444', '幸福里5栋408'),
+    ]
+    ht_statuses = ['pending', 'accepted', 'processing', 'completed']
+    cursor.execute('SELECT COUNT(*) FROM health_orders')
+    if cursor.fetchone()[0] == 0:
+        for i in range(4):
+            hs = health_services[i % len(health_services)]
+            c = ht_customers[i % len(ht_customers)]
+            order_no = f'JK{today.strftime("%Y%m%d")}{i+1:02d}'
+            bk_date = (today + timedelta(days=i)).strftime('%Y-%m-%d')
+            bk_time = f'{9+i}:00'
+            ht_status = ht_statuses[i % len(ht_statuses)]
+            comp_at = (today + timedelta(days=i, hours=1)).strftime('%Y-%m-%d %H:%M') if ht_status == 'completed' else None
+            rt = 5 if ht_status == 'completed' else None
+            rv = '服务很专业，下次继续预约' if ht_status == 'completed' else None
+            cursor.execute('''
+                INSERT INTO health_orders
+                (order_no, service_type, service_type_name, book_date, book_time,
+                 contact_name, contact_phone, address, remark, status,
+                 staff_id, staff_name, completed_at, rating, review)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (order_no, hs[0], hs[1], bk_date, bk_time,
+                  c[0], c[1], c[2], '', ht_status,
+                  None, None, comp_at, rt, rv))
+        print('✅ 健康服务模拟数据已添加')
     
 # ============ 静态文件服务 ============
 
