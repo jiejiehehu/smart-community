@@ -198,6 +198,22 @@
         .category-info h3 { font-size: 15px; color: var(--color-text-primary); font-weight: 600; margin-bottom: 2px; }
         .category-info p { font-size: 12px; color: var(--color-text-tertiary); }
         .service-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .service-categories { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+        .service-category-card {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            padding: 16px; display: flex; align-items: center; gap: 14px;
+            box-shadow: var(--shadow-xs); cursor: pointer; transition: all 0.15s;
+        }
+        .service-category-card:active { transform: scale(0.98); box-shadow: var(--shadow-sm); }
+        .service-category-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+        }
+        .service-category-info { flex: 1; }
+        .service-category-name { font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 3px; }
+        .service-category-desc { font-size: 12px; color: var(--color-text-tertiary); }
+        .service-category-arrow { color: var(--color-text-placeholder); font-size: 16px; }
         .service-tag {
             background: var(--color-bg-light); padding: 5px 10px;
             border-radius: 20px; font-size: 12px; color: var(--color-text-secondary);
@@ -685,14 +701,13 @@
                     <span class="header-title" id="serviceTitle">服务预约</span>
                 </div>
             </div>
-            <div class="detail-content" id="serviceContent" style="padding:16px;">
-                <!-- 动态加载服务内容 -->
-                <div class="empty-state" style="padding:40px 20px;">
-                    <div class="empty-state-icon">📋</div>
-                    <div class="empty-state-title">请选择服务类型</div>
-                    <div class="empty-state-desc">从首页快捷入口选择您需要的生活服务</div>
-                </div>
+            <div class="service-categories" id="serviceCategoryList">
+                <!-- 服务分类由 JS 动态加载 -->
             </div>
+            <div class="detail-content" id="serviceContent" style="padding:16px; display:none;">
+                <!-- 动态加载服务内容 -->
+            </div>
+        </div>
         </div>
 
         <!-- ========== 消息页面 ========== -->
@@ -872,7 +887,14 @@
                 }
             }
             if (pageId === 'home') loadHomeData();
-            if (pageId === 'service' && param) loadServiceContent(param);
+            if (pageId === 'service' && param) {
+                loadServiceContent(param);
+            } else if (pageId === 'service') {
+                // 无参数时显示服务分类列表
+                document.getElementById('serviceCategoryList').style.display = '';
+                document.getElementById('serviceContent').style.display = 'none';
+                loadServiceCategories();
+            }
             if (pageId === 'doctor') loadDoctorList();
         }
 
@@ -930,9 +952,52 @@
         }
 
         // ========= 加载服务内容 =========
+        // ========= 显示服务分类列表 =========
+        function showServiceCategories() {
+            var catList = document.getElementById('serviceCategoryList');
+            var content = document.getElementById('serviceContent');
+            if (catList) catList.style.display = '';
+            if (content) content.style.display = 'none';
+            // 返回按钮重置为回到首页
+            var backBtn = document.querySelector('#page-service .header-back');
+            if (backBtn) backBtn.onclick = function() { showPage('home'); };
+        }
+
+        // ========= 加载服务分类列表 =========
+        function loadServiceCategories() {
+            const list = document.getElementById('serviceCategoryList');
+            if (!list) return;
+            const categories = [
+                { key:'housekeeping', icon:'🧹', color:'#e6f7ff', label:'家政服务', desc:'日常保洁、大扫除、照顾老人/小孩' },
+                { key:'canteen', icon:'🍽️', color:'#fff7e6', label:'社区食堂', desc:'营养套餐、送餐上门' },
+                { key:'repair', icon:'🔧', color:'#f0f5ff', label:'报修服务', desc:'水电维修、家电维修、管道疏通' },
+                { key:'property', icon:'🏦', color:'#f6ffed', label:'物业缴费', desc:'物业费、水电费在线缴纳' },
+                { key:'visitor', icon:'📨', color:'#fff0f6', label:'访客管理', desc:'访客邀请、临时门禁授权' },
+                { key:'parking', icon:'🅿️', color:'#e6fffb', label:'车位服务', desc:'车位预约、停车缴费' },
+                { key:'health', icon:'❤️', color:'#fff1f0', label:'健康服务', desc:'送药上门、陪诊、康复训练' },
+            ];
+            list.innerHTML = categories.map(c => `
+                <div class="service-category-card" onclick="loadServiceContent('${c.key}')">
+                    <div class="service-category-icon" style="background:${c.color};">${c.icon}</div>
+                    <div class="service-category-info">
+                        <div class="service-category-name">${c.label}</div>
+                        <div class="service-category-desc">${c.desc}</div>
+                    </div>
+                    <div class="service-category-arrow">›</div>
+                </div>
+            `).join('');
+        }
+
         function loadServiceContent(type) {
             const content = document.getElementById('serviceContent');
+            const catList = document.getElementById('serviceCategoryList');
             if (!content) return;
+            // 隐藏分类列表，显示内容区
+            if (catList) catList.style.display = 'none';
+            content.style.display = '';
+            // 更新返回按钮：返回分类列表
+            var backBtn = document.querySelector('#page-service .header-back');
+            if (backBtn) backBtn.onclick = showServiceCategories;
             let html = '';
             if (type === 'housekeeping') {
                 html = '<div class="form-card">' +
