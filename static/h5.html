@@ -538,6 +538,10 @@
                 </div>
                 <div class="quick-item" onclick="showPage('service','health')">
                     <div class="quick-icon" style="background: linear-gradient(135deg, #fff0f6 0%, #ffadd2 100%);">🏥</div>
+                    <span class="quick-name">康养服务</span>
+                </div>
+                <div class="quick-item" onclick="showPage('doctor')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #e6f3ff 0%, #b3d9ff 100%);">👨⚕️</div>
                     <span class="quick-name">社区医生</span>
                 </div>
                 <div class="quick-item" onclick="showPage('service','more')">
@@ -795,6 +799,7 @@
             }
             if (pageId === 'home') loadHomeData();
             if (pageId === 'service' && param) loadServiceContent(param);
+            if (pageId === 'doctor') loadDoctorList();
         }
 
         function switchTab(pageId, tabEl) {
@@ -1046,8 +1051,58 @@
                 contact_phone: document.getElementById('htPhone').value,
                 address: document.getElementById('htAddress').value,
             };
-            const res = await api('api/health/records', { method: 'POST', body: JSON.stringify(data) });
+            const res = await api('api/health/orders', { method: 'POST', body: JSON.stringify(data) });
             if (res && res.code === 0) { showH5Toast('健康服务预约成功！', 'success'); }
+            else { showH5Toast('预约失败，请重试', 'error'); }
+        }
+
+        // ============ 社区医生功能 ============
+        async function loadDoctorList() {
+            const list = document.getElementById('doctorList');
+            if (!list) return;
+            const res = await api('api/community/doctors');
+            if (!res || res.code !== 0) {
+                list.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">加载失败</div>';
+                return;
+            }
+            const doctors = res.data || [];
+            list.innerHTML = doctors.map(d => `
+                <div class="doctor-card">
+                    <div class="doctor-avatar-lg">👨⚕️</div>
+                    <div class="doctor-info">
+                        <div class="doctor-name-row">
+                            <span class="doctor-name">${d.name}</span>
+                            <span class="doctor-title-tag">${d.title || '医师'}</span>
+                        </div>
+                        <div class="doctor-dept">${d.department || '全科'}</div>
+                        <div class="doctor-stats">
+                            <span>⭐ ${d.rating || '4.8'}</span>
+                            <span>📅 已预约 ${d.appointment_count || 0} 次</span>
+                        </div>
+                    </div>
+                    <button class="doctor-sign-btn" onclick="bookDoctor(${d.id}, '${d.name}')">预约</button>
+                </div>
+            `).join('');
+        }
+
+        async function bookDoctor(doctorId, doctorName) {
+            const date = prompt('请输入预约日期（如 2026-06-01）：');
+            if (!date) return;
+            const time = prompt('请输入预约时间（如 09:00）：');
+            if (!time) return;
+            const online = await checkBackend();
+            if (!online) { showH5Toast('后端未连接', 'info'); return; }
+            const data = {
+                doctor_id: doctorId,
+                doctor_name: doctorName,
+                resident_name: '李明华',
+                resident_phone: '13812345678',
+                appointment_date: date,
+                appointment_time: time,
+                symptom: ''
+            };
+            const res = await api('api/community/doctors/appointments', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) { showH5Toast('预约成功！', 'success'); }
             else { showH5Toast('预约失败，请重试', 'error'); }
         }
 
@@ -1077,5 +1132,19 @@
         checkBackend();
         setTimeout(() => { loadHomeData(); }, 500);
     </script>
+
+            <!-- 社区医生页面 -->
+            <div class="page" id="page-doctor">
+                <div class="header">
+                    <div class="header-top">
+                        <div class="header-back" onclick="showPage('home')">‹</div>
+                        <div class="header-title">社区医生</div>
+                        <div style="width:32px;"></div>
+                    </div>
+                </div>
+                <div class="doctor-list" id="doctorList">
+                    <!-- 医生列表由 JS 动态加载 -->
+                </div>
+            </div>
 </body>
 </html>

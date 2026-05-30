@@ -426,7 +426,22 @@ def init_db():
         signing_count INTEGER DEFAULT 0,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )''')
-    
+
+    # 医生预约表
+    cursor.execute('''CREATE TABLE IF NOT EXISTS doctor_appointments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doctor_id INTEGER NOT NULL,
+        doctor_name TEXT NOT NULL,
+        resident_name TEXT NOT NULL,
+        resident_phone TEXT NOT NULL,
+        appointment_date TEXT NOT NULL,
+        appointment_time TEXT NOT NULL,
+        symptom TEXT,
+        status TEXT DEFAULT 'pending',
+        reply TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )''')
+
     # 签约管理表
     cursor.execute('''CREATE TABLE IF NOT EXISTS community_signings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -2452,6 +2467,47 @@ def delete_community_doctor(doctor_id):
     conn.close()
     return jsonify({'code': 0, 'message': '删除成功'})
 
+
+
+@app.route('/api/community/doctors/appointments', methods=['POST'])
+def create_doctor_appointment():
+    """居民预约医生"""
+    data = request.get_json()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO doctor_appointments
+        (doctor_id, doctor_name, resident_name, resident_phone,
+         appointment_date, appointment_time, symptom, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data.get('doctor_id'),
+        data.get('doctor_name', ''),
+        data.get('resident_name', ''),
+        data.get('resident_phone', ''),
+        data.get('appointment_date', ''),
+        data.get('appointment_time', ''),
+        data.get('symptom', ''),
+        'pending'
+    ))
+    conn.commit()
+    apt_id = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '预约成功', 'data': {'id': apt_id}})
+
+@app.route('/api/community/doctors/appointments', methods=['GET'])
+def get_doctor_appointments():
+    """获取医生预约列表"""
+    conn = get_db()
+    cursor = conn.cursor()
+    doctor_id = request.args.get('doctor_id', '')
+    if doctor_id:
+        cursor.execute('SELECT * FROM doctor_appointments WHERE doctor_id=? ORDER BY created_at DESC', (doctor_id,))
+    else:
+        cursor.execute('SELECT * FROM doctor_appointments ORDER BY created_at DESC')
+    rows = cursor.fetchall()
+    conn.close()
+    return jsonify({'code': 0, 'data': [dict(r) for r in rows]})
 @app.route('/api/community/signings', methods=['GET'])
 def get_community_signings():
     conn = get_db()
