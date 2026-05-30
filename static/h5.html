@@ -231,7 +231,7 @@
             color: var(--color-text-secondary); transition: all 0.15s; font-weight: 500;
         }
         .msg-tab.active { background: var(--color-primary); color: white; box-shadow: var(--shadow-primary); }
-        .msg-list { padding: 0 16px; }
+        .msg-list { padding: 0 16px calc(80px + env(safe-area-inset-bottom)); }
         .msg-item {
             display: flex; gap: 12px; padding: 14px 0;
             border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background 0.15s;
@@ -708,7 +708,6 @@
                 <!-- 动态加载服务内容 -->
             </div>
         </div>
-        </div>
 
         <!-- ========== 消息页面 ========== -->
         <div class="page" id="page-msg">
@@ -808,7 +807,6 @@
                 <!-- 医生列表由 JS 动态加载 -->
             </div>
         </div>
-    </div>
 
     <!-- 底部 Tab 栏 -->
     <div class="tab-bar">
@@ -828,6 +826,7 @@
             <div class="tab-icon">👤</div>
             <span>我的</span>
         </div>
+    </div>
     </div>
 
     <script>
@@ -901,7 +900,9 @@
         function switchTab(pageId, tabEl) {
             document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
             if (tabEl) tabEl.classList.add('active');
-            showPage(pageId);
+            // Tab栏的"服务"用 'service-all' 作为标识，但实际页面是 'service'
+            var actualPageId = (pageId === 'service-all') ? 'service' : pageId;
+            showPage(actualPageId);
         }
 
         function switchMsgTab(el, type) {
