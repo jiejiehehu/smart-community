@@ -25,3 +25,6 @@ prototype.html
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# 数据库文件
+data/*.db

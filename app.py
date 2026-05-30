@@ -507,6 +507,51 @@ def init_db():
         status TEXT DEFAULT 'pending',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )''')
+    # ============ 居民端：家庭成员表 ============
+    cursor.execute('''CREATE TABLE IF NOT EXISTS family_members (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        resident_name TEXT NOT NULL,
+        relation TEXT NOT NULL,
+        gender TEXT,
+        birth_date TEXT,
+        phone TEXT,
+        id_card TEXT,
+        health_status TEXT,
+        remark TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    # ============ 居民端：收货地址表 ============
+    cursor.execute('''CREATE TABLE IF NOT EXISTS shipping_addresses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        contact_name TEXT NOT NULL,
+        contact_phone TEXT NOT NULL,
+        province TEXT,
+        city TEXT,
+        district TEXT,
+        detail_address TEXT NOT NULL,
+        is_default INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    # ============ 居民端：健康档案主表 ============
+    cursor.execute('''CREATE TABLE IF NOT EXISTS health_profile (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        resident_name TEXT NOT NULL,
+        gender TEXT,
+        birth_date TEXT,
+        height REAL,
+        weight REAL,
+        bmi REAL,
+        blood_type TEXT,
+        allergies TEXT,
+        chronic_diseases TEXT,
+        medications TEXT,
+        last_exam_date TEXT,
+        exam_summary TEXT,
+        remark TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )''')
         # 检查是否已有数据
     # 兼容性处理：为旧数据库添加缺失的列
     try:
@@ -2622,6 +2667,219 @@ def reply_community_consultation(consult_id):
     conn.close()
     return jsonify({'code': 0, 'message': '回复成功'})
 
+
+
+
+# ============ 居民端：家庭成员 API ============
+
+@app.route('/api/family-members', methods=['GET'])
+def get_family_members():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM family_members ORDER BY id DESC')
+    rows = cursor.fetchall()
+    conn.close()
+    return jsonify({'code': 0, 'data': [dict(row) for row in rows]})
+
+@app.route('/api/family-members', methods=['POST'])
+def create_family_member():
+    data = request.get_json()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''INSERT INTO family_members
+        (resident_name, relation, gender, birth_date, phone, id_card, health_status, remark)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+        (data.get('resident_name', ''), data.get('relation', ''),
+         data.get('gender', ''), data.get('birth_date', ''),
+         data.get('phone', ''), data.get('id_card', ''),
+         data.get('health_status', ''), data.get('remark', '')))
+    conn.commit()
+    mid = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '添加成功', 'data': {'id': mid}})
+
+@app.route('/api/family-members/<int:member_id>', methods=['PUT'])
+def update_family_member(member_id):
+    data = request.get_json()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''UPDATE family_members SET
+        resident_name=?, relation=?, gender=?, birth_date=?, phone=?,
+        id_card=?, health_status=?, remark=?
+        WHERE id=?''',
+        (data.get('resident_name', ''), data.get('relation', ''),
+         data.get('gender', ''), data.get('birth_date', ''),
+         data.get('phone', ''), data.get('id_card', ''),
+         data.get('health_status', ''), data.get('remark', ''),
+         member_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '修改成功'})
+
+@app.route('/api/family-members/<int:member_id>', methods=['DELETE'])
+def delete_family_member(member_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM family_members WHERE id=?', (member_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '删除成功'})
+
+# ============ 居民端：收货地址 API ============
+
+@app.route('/api/shipping-addresses', methods=['GET'])
+def get_shipping_addresses():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM shipping_addresses ORDER BY is_default DESC, id DESC')
+    rows = cursor.fetchall()
+    conn.close()
+    return jsonify({'code': 0, 'data': [dict(row) for row in rows]})
+
+@app.route('/api/shipping-addresses', methods=['POST'])
+def create_shipping_address():
+    data = request.get_json()
+    conn = get_db()
+    cursor = conn.cursor()
+    if data.get('is_default') == 1:
+        cursor.execute('UPDATE shipping_addresses SET is_default=0')
+    cursor.execute('''INSERT INTO shipping_addresses
+        (contact_name, contact_phone, province, city, district, detail_address, is_default)
+        VALUES (?, ?, ?, ?, ?, ?, ?)''',
+        (data.get('contact_name', ''), data.get('contact_phone', ''),
+         data.get('province', ''), data.get('city', ''),
+         data.get('district', ''), data.get('detail_address', ''),
+         data.get('is_default', 0)))
+    aid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '添加成功', 'data': {'id': aid}})
+
+@app.route('/api/shipping-addresses/<int:addr_id>', methods=['PUT'])
+def update_shipping_address(addr_id):
+    data = request.get_json()
+    conn = get_db()
+    cursor = conn.cursor()
+    if data.get('is_default') == 1:
+        cursor.execute('UPDATE shipping_addresses SET is_default=0')
+    cursor.execute('''UPDATE shipping_addresses SET
+        contact_name=?, contact_phone=?, province=?, city=?, district=?,
+        detail_address=?, is_default=?
+        WHERE id=?''',
+        (data.get('contact_name', ''), data.get('contact_phone', ''),
+         data.get('province', ''), data.get('city', ''),
+         data.get('district', ''), data.get('detail_address', ''),
+         data.get('is_default', 0), addr_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '修改成功'})
+
+@app.route('/api/shipping-addresses/<int:addr_id>/set-default', methods=['PUT'])
+def set_default_address(addr_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE shipping_addresses SET is_default=0')
+    cursor.execute('UPDATE shipping_addresses SET is_default=1 WHERE id=?', (addr_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '已设为默认'})
+
+@app.route('/api/shipping-addresses/<int:addr_id>', methods=['DELETE'])
+def delete_shipping_address(addr_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM shipping_addresses WHERE id=?', (addr_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '删除成功'})
+
+# ============ 居民端：健康档案 API ============
+
+@app.route('/api/health-profile', methods=['GET'])
+def get_health_profiles():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM health_profile ORDER BY id DESC')
+    rows = cursor.fetchall()
+    conn.close()
+    return jsonify({'code': 0, 'data': [dict(row) for row in rows]})
+
+@app.route('/api/health-profile', methods=['POST'])
+def create_health_profile():
+    data = request.get_json()
+    height = data.get('height', 0)
+    weight = data.get('weight', 0)
+    bmi = round(weight / ((height/100)**2), 1) if height and weight else 0
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''INSERT INTO health_profile
+        (resident_name, gender, birth_date, height, weight, bmi,
+         blood_type, allergies, chronic_diseases, medications,
+         last_exam_date, exam_summary, remark)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+        (data.get('resident_name', ''), data.get('gender', ''),
+         data.get('birth_date', ''), height, weight, bmi,
+         data.get('blood_type', ''), data.get('allergies', ''),
+         data.get('chronic_diseases', ''), data.get('medications', ''),
+         data.get('last_exam_date', ''), data.get('exam_summary', ''),
+         data.get('remark', '')))
+    pid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '保存成功', 'data': {'id': pid}})
+
+@app.route('/api/health-profile/<int:profile_id>', methods=['PUT'])
+def update_health_profile(profile_id):
+    data = request.get_json()
+    height = data.get('height', 0)
+    weight = data.get('weight', 0)
+    bmi = round(weight / ((height/100)**2), 1) if height and weight else 0
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''UPDATE health_profile SET
+        resident_name=?, gender=?, birth_date=?, height=?, weight=?, bmi=?,
+        blood_type=?, allergies=?, chronic_diseases=?, medications=?,
+        last_exam_date=?, exam_summary=?, remark=?
+        WHERE id=?''',
+        (data.get('resident_name', ''), data.get('gender', ''),
+         data.get('birth_date', ''), height, weight, bmi,
+         data.get('blood_type', ''), data.get('allergies', ''),
+         data.get('chronic_diseases', ''), data.get('medications', ''),
+         data.get('last_exam_date', ''), data.get('exam_summary', ''),
+         data.get('remark', ''), profile_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '修改成功'})
+
+@app.route('/api/health-profile/<int:profile_id>', methods=['DELETE'])
+def delete_health_profile(profile_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM health_profile WHERE id=?', (profile_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '删除成功'})
+
+# ============ 居民端：我的订单 API（合并报修+康养） ============
+
+@app.route('/api/my-orders', methods=['GET'])
+def get_my_orders():
+    conn = get_db()
+    cursor = conn.cursor()
+    result = []
+    cursor.execute('SELECT id, order_no, repair_type as service_type, repair_desc as service_desc, status, created_at, appointment_time as book_time FROM repair_orders')
+    for row in cursor.fetchall():
+        d = dict(row)
+        d['order_type'] = 'repair'
+        result.append(d)
+    cursor.execute('SELECT id, order_no, service_type, service_type_name as service_desc, status, created_at, book_time FROM health_orders')
+    for row in cursor.fetchall():
+        d = dict(row)
+        d['order_type'] = 'health'
+        result.append(d)
+    result.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+    conn.close()
+    return jsonify({'code': 0, 'data': result})
 
 # 此文件内容将被插入到 app.py 的 if __name__ == '__main__': 之前
 

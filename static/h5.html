@@ -498,6 +498,75 @@
             border-radius: 50%; background: var(--color-bg-light); cursor: pointer; font-size: 18px;
         }
         .booking-modal-close:active { background: var(--color-border); }
+
+        /* 我的页面 CRUD 样式 */
+        .card-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .card-action-btn {
+            padding: 4px 12px; border-radius: 6px; font-size: 12px;
+            border: 1px solid var(--color-border); background: white;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .card-action-btn.edit { color: var(--color-primary); border-color: var(--color-primary); }
+        .card-action-btn.edit:active { background: var(--color-primary); color: white; }
+        .card-action-btn.delete { color: #e74c3c; border-color: #e74c3c; }
+        .card-action-btn.delete:active { background: #e74c3c; color: white; }
+        .status-tag {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 500;
+        }
+        .status-tag.warning { background: #fff7e6; color: #d48806; }
+        .status-tag.info { background: #e6f7ff; color: #1890ff; }
+        .status-tag.primary { background: #e6fffb; color: #13c2c2; }
+        .status-tag.success { background: #f6ffed; color: #52c41a; }
+        .status-tag.default { background: #f5f5f5; color: #999; }
+        .tag-default {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 11px; background: #e6fffb; color: var(--color-primary);
+        }
+        .default-card { border: 2px solid var(--color-primary); }
+        .form-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: flex; align-items: flex-end; justify-content: center;
+        }
+        .form-modal {
+            background: white; width: 100%; max-width: 430px;
+            border-radius: 16px 16px 0 0; padding: 20px 16px;
+            max-height: 85vh; overflow-y: auto;
+            animation: slideUp 0.25s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .form-title { font-size: 17px; font-weight: 600; margin-bottom: 16px; text-align: center; }
+        .form-body { display: flex; flex-direction: column; gap: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 13px; color: var(--color-text-2); }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 12px; border: 1px solid var(--color-border);
+            border-radius: 8px; font-size: 14px; outline: none;
+            transition: border-color 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--color-primary);
+        }
+        .form-group textarea { min-height: 60px; resize: vertical; }
+        .form-footer {
+            display: flex; gap: 12px; margin-top: 20px;
+        }
+        .btn-cancel, .btn-submit {
+            flex: 1; padding: 12px; border-radius: 10px;
+            font-size: 15px; font-weight: 500; border: none; cursor: pointer;
+        }
+        .btn-cancel { background: #f5f5f5; color: var(--color-text-2); }
+        .btn-cancel:active { background: #eee; }
+        .btn-submit { background: var(--color-primary); color: white; }
+        .btn-submit:active { opacity: 0.85; }
+        .header-action {
+            margin-left: auto; font-size: 13px; color: var(--color-primary);
+            cursor: pointer; font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -795,6 +864,7 @@
         </div>
 
         <!-- ========== 我的订单 ========== -->
+                <!-- ========== 我的订单 ========== -->
         <div class="page" id="page-my-orders">
             <div class="status-bar">
                 <span class="status-bar-time">9:41</span>
@@ -804,33 +874,17 @@
                 <div class="header-top">
                     <div class="header-back" onclick="showPage('my')">←</div>
                     <span class="header-title">📋 我的订单</span>
+                    <span class="header-action" onclick="loadMyOrders()">刷新</span>
                 </div>
             </div>
-            <div class="service-categories" style="padding-top: 16px;">
-                <div class="service-category-card">
-                    <div class="category-icon">🔧</div>
-                    <div class="category-info">
-                        <h3>卫生间水管报修</h3>
-                        <p>状态：已派单 | 2026-05-28</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">🧹</div>
-                    <div class="category-info">
-                        <h3>家政保洁服务</h3>
-                        <p>状态：已完成 | 2026-05-20</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">💰</div>
-                    <div class="category-info">
-                        <h3>2026年5月物业费</h3>
-                        <p>状态：已缴费 | 2026-05-01</p>
-                    </div>
+            <div class="msg-list" id="myOrdersList" style="padding-bottom: calc(80px + env(safe-area-inset-bottom));">
+                <div class="empty-state" id="ordersEmpty">
+                    <div class="empty-icon">📋</div>
+                    <p>暂无订单</p>
+                    <small>去首页下单吧</small>
                 </div>
             </div>
         </div>
-
         <!-- ========== 健康档案 ========== -->
         <div class="page" id="page-my-health">
             <div class="status-bar">
@@ -841,40 +895,17 @@
                 <div class="header-top">
                     <div class="header-back" onclick="showPage('my')">←</div>
                     <span class="header-title">❤️ 健康档案</span>
+                    <span class="header-action" onclick="showAddHealthForm()">+ 新建</span>
                 </div>
             </div>
-            <div class="service-categories" style="padding-top: 16px;">
-                <div class="service-category-card">
-                    <div class="category-icon">📏</div>
-                    <div class="category-info">
-                        <h3>身高体重</h3>
-                        <p>175cm / 72kg | BMI 23.5</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">🩸</div>
-                    <div class="category-info">
-                        <h3>血压记录</h3>
-                        <p>128/82 mmHg | 2026-05-25</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">🩺</div>
-                    <div class="category-info">
-                        <h3>最近一次体检</h3>
-                        <p>2026-03-15 | 各项指标正常</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">💊</div>
-                    <div class="category-info">
-                        <h3>慢性病管理</h3>
-                        <p>轻度高血压 | 每日服药记录</p>
-                    </div>
+            <div class="service-categories" id="healthProfileList" style="padding-bottom: calc(80px + env(safe-area-inset-bottom));">
+                <div class="empty-state" id="healthEmpty">
+                    <div class="empty-icon">❤️</div>
+                    <p>暂无健康档案</p>
+                    <small>点击右上角 + 新建</small>
                 </div>
             </div>
         </div>
-
         <!-- ========== 家庭成员 ========== -->
         <div class="page" id="page-my-family">
             <div class="status-bar">
@@ -885,33 +916,17 @@
                 <div class="header-top">
                     <div class="header-back" onclick="showPage('my')">←</div>
                     <span class="header-title">👨‍👩‍👧 家庭成员</span>
+                    <span class="header-action" onclick="showAddFamilyForm()">+ 添加</span>
                 </div>
             </div>
-            <div class="service-categories" style="padding-top: 16px;">
-                <div class="service-category-card">
-                    <div class="category-icon">👨</div>
-                    <div class="category-info">
-                        <h3>李明华（本人）</h3>
-                        <p>男 | 65岁 | 户主</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">👩</div>
-                    <div class="category-info">
-                        <h3>王秀英</h3>
-                        <p>女 | 63岁 | 配偶</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">👦</div>
-                    <div class="category-info">
-                        <h3>李小明</h3>
-                        <p>男 | 35岁 | 儿子</p>
-                    </div>
+            <div class="service-categories" id="familyMemberList" style="padding-bottom: calc(80px + env(safe-area-inset-bottom));">
+                <div class="empty-state" id="familyEmpty">
+                    <div class="empty-icon">👨‍👩‍👧</div>
+                    <p>暂无家庭成员</p>
+                    <small>点击右上角 + 添加</small>
                 </div>
             </div>
         </div>
-
         <!-- ========== 收货地址 ========== -->
         <div class="page" id="page-my-address">
             <div class="status-bar">
@@ -922,26 +937,17 @@
                 <div class="header-top">
                     <div class="header-back" onclick="showPage('my')">←</div>
                     <span class="header-title">🏠 收货地址</span>
+                    <span class="header-action" onclick="showAddAddressForm()">+ 添加</span>
                 </div>
             </div>
-            <div class="service-categories" style="padding-top: 16px;">
-                <div class="service-category-card">
-                    <div class="category-icon">📍</div>
-                    <div class="category-info">
-                        <h3>李明华 138****8888</h3>
-                        <p>湖北省武汉市东湖社区碧水园3栋2单元1501</p>
-                    </div>
-                </div>
-                <div class="service-category-card">
-                    <div class="category-icon">📍</div>
-                    <div class="category-info">
-                        <h3>王秀英 139****6666</h3>
-                        <p>湖北省武汉市东湖社区碧水园3栋2单元1501</p>
-                    </div>
+            <div class="service-categories" id="addressList" style="padding-bottom: calc(80px + env(safe-area-inset-bottom));">
+                <div class="empty-state" id="addressEmpty">
+                    <div class="empty-icon">🏠</div>
+                    <p>暂无收货地址</p>
+                    <small>点击右上角 + 添加</small>
                 </div>
             </div>
         </div>
-
         <!-- ========== 设置 ========== -->
         <div class="page" id="page-my-settings">
             <div class="status-bar">
@@ -954,47 +960,49 @@
                     <span class="header-title">⚙️ 设置</span>
                 </div>
             </div>
-            <div class="service-categories" style="padding-top: 16px;">
-                <div class="service-category-card" onclick="showH5Toast('功能开发中','info')">
+            <div class="service-categories" style="padding-top: 16px; padding-bottom: calc(80px + env(safe-area-inset-bottom));">
+                <div class="service-category-card" onclick="showChangePasswordForm()">
                     <div class="category-icon">🔔</div>
                     <div class="category-info">
-                        <h3>消息通知</h3>
-                        <p>已开启</p>
+                        <h3>修改密码</h3>
+                        <p>定期修改密码保护账号安全</p>
                     </div>
+                    <div class="category-arrow">›</div>
                 </div>
-                <div class="service-category-card" onclick="showH5Toast('功能开发中','info')">
-                    <div class="category-icon">🔒</div>
-                    <div class="category-info">
-                        <h3>账号与安全</h3>
-                        <p>修改密码、绑定手机</p>
-                    </div>
-                </div>
-                <div class="service-category-card" onclick="showH5Toast('功能开发中','info')">
-                    <div class="category-icon">🌙</div>
-                    <div class="category-info">
-                        <h3>深色模式</h3>
-                        <p>跟随系统</p>
-                    </div>
-                </div>
-                <div class="service-category-card" onclick="showH5Toast('功能开发中','info')">
+                <div class="service-category-card" onclick="clearCache()">
                     <div class="category-icon">🧹</div>
                     <div class="category-info">
                         <h3>清除缓存</h3>
-                        <p>当前 12.5 MB</p>
+                        <p id="cacheSize">当前 12.5 MB</p>
                     </div>
+                    <div class="category-arrow">›</div>
                 </div>
-                <div class="service-category-card" onclick="showH5Toast('功能开发中','info')">
+                <div class="service-category-card" onclick="showH5Toast('已是最新版本', 'info')">
                     <div class="category-icon">ℹ️</div>
                     <div class="category-info">
+                        <h3>检查更新</h3>
+                        <p>当前版本 v1.2.0</p>
+                    </div>
+                    <div class="category-arrow">›</div>
+                </div>
+                <div class="service-category-card" onclick="showH5Toast('关于我们', 'info')">
+                    <div class="category-icon">📱</div>
+                    <div class="category-info">
                         <h3>关于我们</h3>
-                        <p>版本 v1.2.0</p>
+                        <p>智慧社区养老服务平台 v1.2.0</p>
+                    </div>
+                    <div class="category-arrow">›</div>
+                </div>
+                <div class="service-category-card" onclick="logoutApp()">
+                    <div class="category-icon" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">🚪</div>
+                    <div class="category-info">
+                        <h3 style="color: #e74c3c;">退出登录</h3>
+                        <p>退出后需要重新登录</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- 社区医生页面 -->
-        <div class="page" id="page-doctor">
+<div class="page" id="page-doctor">
             <div class="header">
                 <div class="header-top">
                     <div class="header-back" onclick="showPage('home')">‹</div>
@@ -1094,6 +1102,10 @@
                 loadServiceCategories();
             }
             if (pageId === 'doctor') loadDoctorList();
+            if (pageId === 'my-orders') loadMyOrders();
+            if (pageId === 'my-health') loadHealthProfiles();
+            if (pageId === 'my-family') loadFamilyMembers();
+            if (pageId === 'my-address') loadShippingAddresses();
         }
 
         function switchTab(pageId, tabEl) {
@@ -1111,6 +1123,430 @@
                 item.style.display = (type === 'all' || item.dataset.type === type) ? '' : 'none';
             });
         }
+
+
+        // ========== 我的订单 ==========
+        async function loadMyOrders() {
+            const res = await api('api/my-orders', { method: 'GET' });
+            if (!res || res.code !== 0) { showH5Toast('加载失败', 'error'); return; }
+            const list = document.getElementById('myOrdersList');
+            const empty = document.getElementById('ordersEmpty');
+            if (!res.data || res.data.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            let html = '';
+            res.data.forEach(o => {
+                const statusMap = {pending:'待处理',accepted:'已接单',processing:'服务中',pending_review:'待评价',completed:'已完成',cancelled:'已取消'};
+                const statusClass = {pending:'warning',accepted:'info',processing:'primary',pending_review:'warning',completed:'success',cancelled:'default'};
+                const typeLabel = o.order_type === 'repair' ? '报修' : '康养';
+                html += `<div class="service-category-card" onclick="showOrderDetail(${o.id},'${o.order_type}')">
+                    <div class="category-icon">${o.order_type === 'repair' ? '🔧' : '💊'}</div>
+                    <div class="category-info">
+                        <h3>${typeLabel}：${o.service_desc || o.service_type || ''}</h3>
+                        <p>状态：<span class="status-tag ${statusClass[o.status] || 'default'}">${statusMap[o.status] || o.status}</span></p>
+                        <p>${o.created_at || ''}</p>
+                    </div>
+                </div>`;
+            });
+            // 保留 empty-state，插入列表
+            const existing = list.querySelectorAll('.service-category-card');
+            existing.forEach(e => e.remove());
+            list.insertAdjacentHTML('beforeend', html);
+        }
+        function showOrderDetail(id, type) {
+            showH5Toast('订单详情开发中', 'info');
+        }
+
+        // ========== 健康档案 CRUD ==========
+        async function loadHealthProfiles() {
+            const res = await api('api/health-profile', { method: 'GET' });
+            if (!res || res.code !== 0) return;
+            const list = document.getElementById('healthProfileList');
+            const empty = document.getElementById('healthEmpty');
+            if (!res.data || res.data.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            let html = '';
+            res.data.forEach(p => {
+                html += `<div class="service-category-card">
+                    <div class="category-icon">❤️</div>
+                    <div class="category-info">
+                        <h3>${p.resident_name || '未命名'}</h3>
+                        <p>${p.gender || ''} ${p.birth_date || ''}</p>
+                        <p>身高：${p.height || '-'}cm / 体重：${p.weight || '-'}kg / BMI：${p.bmi || '-'}</p>
+                        ${p.blood_type ? `<p>血型：${p.blood_type}</p>` : ''}
+                        ${p.chronic_diseases ? `<p>慢性病：${p.chronic_diseases}</p>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <span class="card-action-btn edit" onclick="editHealthProfile(${p.id})">编辑</span>
+                        <span class="card-action-btn delete" onclick="deleteHealthProfile(${p.id})">删除</span>
+                    </div>
+                </div>`;
+            });
+            const existing = list.querySelectorAll('.service-category-card');
+            existing.forEach(e => e.remove());
+            list.insertAdjacentHTML('beforeend', html);
+        }
+        function showAddHealthForm() {
+            const html = `<div class="form-overlay" id="healthFormOverlay">
+                <div class="form-modal">
+                    <div class="form-title">新建健康档案</div>
+                    <div class="form-body">
+                        <div class="form-group"><label>姓名</label><input id="hpName" placeholder="请输入姓名"></div>
+                        <div class="form-group"><label>性别</label><select id="hpGender"><option value="">请选择</option><option>男</option><option>女</option></select></div>
+                        <div class="form-group"><label>出生日期</label><input id="hpBirth" type="date"></div>
+                        <div class="form-group"><label>身高(cm)</label><input id="hpHeight" type="number" placeholder="请输入身高" oninput="calcBMI()"></div>
+                        <div class="form-group"><label>体重(kg)</label><input id="hpWeight" type="number" placeholder="请输入体重" oninput="calcBMI()"></div>
+                        <div class="form-group"><label>血型</label><select id="hpBloodType"><option value="">请选择</option><option>A型</option><option>B型</option><option>O型</option><option>AB型</option></select></div>
+                        <div class="form-group"><label>过敏史</label><input id="hpAllergies" placeholder="如：青霉素过敏"></div>
+                        <div class="form-group"><label>慢性病</label><input id="hpChronic" placeholder="如：高血压、糖尿病"></div>
+                        <div class="form-group"><label>用药情况</label><input id="hpMeds" placeholder="如：阿司匹林 每日1次"></div>
+                        <div class="form-group"><label>最近体检日期</label><input id="hpExamDate" type="date"></div>
+                        <div class="form-group"><label>体检摘要</label><textarea id="hpExamSummary" placeholder="请输入体检摘要"></textarea></div>
+                    </div>
+                    <div class="form-footer">
+                        <button class="btn-cancel" onclick="closeHealthForm()">取消</button>
+                        <button class="btn-submit" onclick="submitHealthProfile()">保存</button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        function closeHealthForm() {
+            const el = document.getElementById('healthFormOverlay');
+            if (el) el.remove();
+        }
+        function calcBMI() {
+            const h = parseFloat(document.getElementById('hpHeight').value) || 0;
+            const w = parseFloat(document.getElementById('hpWeight').value) || 0;
+            if (h > 0 && w > 0) {
+                const bmi = (w / ((h/100)**2)).toFixed(1);
+                showH5Toast('BMI：' + bmi, 'info');
+            }
+        }
+        async function editHealthProfile(id) {
+            const res = await api('api/health-profile', { method: 'GET' });
+            if (!res || res.code !== 0) return;
+            const p = res.data.find(x => x.id === id);
+            if (!p) return;
+            showAddHealthForm();
+            setTimeout(() => {
+                document.getElementById('hpName').value = p.resident_name || '';
+                document.getElementById('hpGender').value = p.gender || '';
+                document.getElementById('hpBirth').value = p.birth_date || '';
+                document.getElementById('hpHeight').value = p.height || '';
+                document.getElementById('hpWeight').value = p.weight || '';
+                document.getElementById('hpBloodType').value = p.blood_type || '';
+                document.getElementById('hpAllergies').value = p.allergies || '';
+                document.getElementById('hpChronic').value = p.chronic_diseases || '';
+                document.getElementById('hpMeds').value = p.medications || '';
+                document.getElementById('hpExamDate').value = p.last_exam_date || '';
+                document.getElementById('hpExamSummary').value = p.exam_summary || '';
+                document.getElementById('healthFormOverlay').dataset.editId = id;
+            }, 100);
+        }
+        async function deleteHealthProfile(id) {
+            if (!confirm('确认删除此健康档案？')) return;
+            const res = await api(`api/health-profile/${id}`, { method: 'DELETE' });
+            if (res && res.code === 0) { showH5Toast('删除成功', 'success'); loadHealthProfiles(); }
+            else showH5Toast('删除失败', 'error');
+        }
+        async function submitHealthProfile() {
+            const data = {
+                resident_name: document.getElementById('hpName').value,
+                gender: document.getElementById('hpGender').value,
+                birth_date: document.getElementById('hpBirth').value,
+                height: parseFloat(document.getElementById('hpHeight').value) || 0,
+                weight: parseFloat(document.getElementById('hpWeight').value) || 0,
+                blood_type: document.getElementById('hpBloodType').value,
+                allergies: document.getElementById('hpAllergies').value,
+                chronic_diseases: document.getElementById('hpChronic').value,
+                medications: document.getElementById('hpMeds').value,
+                last_exam_date: document.getElementById('hpExamDate').value,
+                exam_summary: document.getElementById('hpExamSummary').value
+            };
+            const editId = document.getElementById('healthFormOverlay').dataset.editId;
+            let res;
+            if (editId) {
+                res = await api(`api/health-profile/${editId}`, { method: 'PUT', body: JSON.stringify(data) });
+            } else {
+                res = await api('api/health-profile', { method: 'POST', body: JSON.stringify(data) });
+            }
+            if (res && res.code === 0) {
+                showH5Toast(editId ? '修改成功' : '保存成功', 'success');
+                closeHealthForm();
+                loadHealthProfiles();
+            } else {
+                showH5Toast('保存失败', 'error');
+            }
+        }
+
+        // ========== 家庭成员 CRUD ==========
+        async function loadFamilyMembers() {
+            const res = await api('api/family-members', { method: 'GET' });
+            if (!res || res.code !== 0) return;
+            const list = document.getElementById('familyMemberList');
+            const empty = document.getElementById('familyEmpty');
+            if (!res.data || res.data.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            let html = '';
+            res.data.forEach(m => {
+                html += `<div class="service-category-card">
+                    <div class="category-icon">👤</div>
+                    <div class="category-info">
+                        <h3>${m.resident_name}（${m.relation}）</h3>
+                        <p>${m.gender || ''} ${m.birth_date || ''}</p>
+                        ${m.phone ? `<p>电话：${m.phone}</p>` : ''}
+                        ${m.health_status ? `<p>健康状况：${m.health_status}</p>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <span class="card-action-btn edit" onclick="editFamilyMember(${m.id})">编辑</span>
+                        <span class="card-action-btn delete" onclick="deleteFamilyMember(${m.id})">删除</span>
+                    </div>
+                </div>`;
+            });
+            const existing = list.querySelectorAll('.service-category-card');
+            existing.forEach(e => e.remove());
+            list.insertAdjacentHTML('beforeend', html);
+        }
+        function showAddFamilyForm() {
+            const html = `<div class="form-overlay" id="familyFormOverlay">
+                <div class="form-modal">
+                    <div class="form-title">添加家庭成员</div>
+                    <div class="form-body">
+                        <div class="form-group"><label>姓名</label><input id="fmName" placeholder="请输入姓名"></div>
+                        <div class="form-group"><label>关系</label><select id="fmRelation">
+                            <option value="户主">户主</option><option value="配偶">配偶</option>
+                            <option value="儿子">儿子</option><option value="女儿">女儿</option>
+                            <option value="父亲">父亲</option><option value="母亲">母亲</option>
+                            <option value="其他">其他</option>
+                        </select></div>
+                        <div class="form-group"><label>性别</label><select id="fmGender"><option value="">请选择</option><option>男</option><option>女</option></select></div>
+                        <div class="form-group"><label>出生日期</label><input id="fmBirth" type="date"></div>
+                        <div class="form-group"><label>联系电话</label><input id="fmPhone" placeholder="请输入联系电话"></div>
+                        <div class="form-group"><label>身份证号</label><input id="fmIdCard" placeholder="请输入身份证号"></div>
+                        <div class="form-group"><label>健康状况</label><input id="fmHealth" placeholder="如：健康、高血压"></div>
+                    </div>
+                    <div class="form-footer">
+                        <button class="btn-cancel" onclick="closeFamilyForm()">取消</button>
+                        <button class="btn-submit" onclick="submitFamilyMember()">保存</button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        function closeFamilyForm() {
+            const el = document.getElementById('familyFormOverlay');
+            if (el) el.remove();
+        }
+        async function editFamilyMember(id) {
+            const res = await api('api/family-members', { method: 'GET' });
+            if (!res || res.code !== 0) return;
+            const m = res.data.find(x => x.id === id);
+            if (!m) return;
+            showAddFamilyForm();
+            setTimeout(() => {
+                document.getElementById('fmName').value = m.resident_name || '';
+                document.getElementById('fmRelation').value = m.relation || '';
+                document.getElementById('fmGender').value = m.gender || '';
+                document.getElementById('fmBirth').value = m.birth_date || '';
+                document.getElementById('fmPhone').value = m.phone || '';
+                document.getElementById('fmIdCard').value = m.id_card || '';
+                document.getElementById('fmHealth').value = m.health_status || '';
+                document.getElementById('familyFormOverlay').dataset.editId = id;
+            }, 100);
+        }
+        async function deleteFamilyMember(id) {
+            if (!confirm('确认删除此家庭成员？')) return;
+            const res = await api(`api/family-members/${id}`, { method: 'DELETE' });
+            if (res && res.code === 0) { showH5Toast('删除成功', 'success'); loadFamilyMembers(); }
+            else showH5Toast('删除失败', 'error');
+        }
+        async function submitFamilyMember() {
+            const data = {
+                resident_name: document.getElementById('fmName').value,
+                relation: document.getElementById('fmRelation').value,
+                gender: document.getElementById('fmGender').value,
+                birth_date: document.getElementById('fmBirth').value,
+                phone: document.getElementById('fmPhone').value,
+                id_card: document.getElementById('fmIdCard').value,
+                health_status: document.getElementById('fmHealth').value
+            };
+            const editId = document.getElementById('familyFormOverlay').dataset.editId;
+            let res;
+            if (editId) {
+                res = await api(`api/family-members/${editId}`, { method: 'PUT', body: JSON.stringify(data) });
+            } else {
+                res = await api('api/family-members', { method: 'POST', body: JSON.stringify(data) });
+            }
+            if (res && res.code === 0) {
+                showH5Toast(editId ? '修改成功' : '添加成功', 'success');
+                closeFamilyForm();
+                loadFamilyMembers();
+            } else {
+                showH5Toast('保存失败', 'error');
+            }
+        }
+
+        // ========== 收货地址 CRUD ==========
+        async function loadShippingAddresses() {
+            const res = await api('api/shipping-addresses', { method: 'GET' });
+            if (!res || res.code !== 0) return;
+            const list = document.getElementById('addressList');
+            const empty = document.getElementById('addressEmpty');
+            if (!res.data || res.data.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            let html = '';
+            res.data.forEach(a => {
+                html += `<div class="service-category-card ${a.is_default ? 'default-card' : ''}">
+                    <div class="category-icon">📍</div>
+                    <div class="category-info">
+                        <h3>${a.contact_name} ${a.is_default ? '<span class="tag-default">默认</span>' : ''}</h3>
+                        <p>${a.contact_phone}</p>
+                        <p>${a.province || ''}${a.city || ''}${a.district || ''}${a.detail_address || ''}</p>
+                    </div>
+                    <div class="card-actions">
+                        ${!a.is_default ? `<span class="card-action-btn" onclick="setDefaultAddress(${a.id})">设为默认</span>` : ''}
+                        <span class="card-action-btn edit" onclick="editAddress(${a.id})">编辑</span>
+                        <span class="card-action-btn delete" onclick="deleteAddress(${a.id})">删除</span>
+                    </div>
+                </div>`;
+            });
+            const existing = list.querySelectorAll('.service-category-card');
+            existing.forEach(e => e.remove());
+            list.insertAdjacentHTML('beforeend', html);
+        }
+        function showAddAddressForm() {
+            const html = `<div class="form-overlay" id="addressFormOverlay">
+                <div class="form-modal">
+                    <div class="form-title">添加收货地址</div>
+                    <div class="form-body">
+                        <div class="form-group"><label>收货人</label><input id="addrName" placeholder="请输入收货人姓名"></div>
+                        <div class="form-group"><label>联系电话</label><input id="addrPhone" placeholder="请输入联系电话"></div>
+                        <div class="form-group"><label>省份</label><input id="addrProvince" placeholder="如：湖北省"></div>
+                        <div class="form-group"><label>城市</label><input id="addrCity" placeholder="如：武汉市"></div>
+                        <div class="form-group"><label>区/县</label><input id="addrDistrict" placeholder="如：洪山区"></div>
+                        <div class="form-group"><label>详细地址</label><input id="addrDetail" placeholder="如：碧水园3栋2单元1501"></div>
+                        <div class="form-group"><label><input type="checkbox" id="addrDefault"> 设为默认地址</label></div>
+                    </div>
+                    <div class="form-footer">
+                        <button class="btn-cancel" onclick="closeAddressForm()">取消</button>
+                        <button class="btn-submit" onclick="submitAddress()">保存</button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        function closeAddressForm() {
+            const el = document.getElementById('addressFormOverlay');
+            if (el) el.remove();
+        }
+        async function editAddress(id) {
+            const res = await api('api/shipping-addresses', { method: 'GET' });
+            if (!res || res.code !== 0) return;
+            const a = res.data.find(x => x.id === id);
+            if (!a) return;
+            showAddAddressForm();
+            setTimeout(() => {
+                document.getElementById('addrName').value = a.contact_name || '';
+                document.getElementById('addrPhone').value = a.contact_phone || '';
+                document.getElementById('addrProvince').value = a.province || '';
+                document.getElementById('addrCity').value = a.city || '';
+                document.getElementById('addrDistrict').value = a.district || '';
+                document.getElementById('addrDetail').value = a.detail_address || '';
+                document.getElementById('addrDefault').checked = a.is_default == 1;
+                document.getElementById('addressFormOverlay').dataset.editId = id;
+            }, 100);
+        }
+        async function deleteAddress(id) {
+            if (!confirm('确认删除此地址？')) return;
+            const res = await api(`api/shipping-addresses/${id}`, { method: 'DELETE' });
+            if (res && res.code === 0) { showH5Toast('删除成功', 'success'); loadShippingAddresses(); }
+            else showH5Toast('删除失败', 'error');
+        }
+        async function setDefaultAddress(id) {
+            const res = await api(`api/shipping-addresses/${id}/set-default`, { method: 'PUT' });
+            if (res && res.code === 0) { showH5Toast('已设为默认', 'success'); loadShippingAddresses(); }
+            else showH5Toast('设置失败', 'error');
+        }
+        async function submitAddress() {
+            const data = {
+                contact_name: document.getElementById('addrName').value,
+                contact_phone: document.getElementById('addrPhone').value,
+                province: document.getElementById('addrProvince').value,
+                city: document.getElementById('addrCity').value,
+                district: document.getElementById('addrDistrict').value,
+                detail_address: document.getElementById('addrDetail').value,
+                is_default: document.getElementById('addrDefault').checked ? 1 : 0
+            };
+            const editId = document.getElementById('addressFormOverlay').dataset.editId;
+            let res;
+            if (editId) {
+                res = await api(`api/shipping-addresses/${editId}`, { method: 'PUT', body: JSON.stringify(data) });
+            } else {
+                res = await api('api/shipping-addresses', { method: 'POST', body: JSON.stringify(data) });
+            }
+            if (res && res.code === 0) {
+                showH5Toast(editId ? '修改成功' : '添加成功', 'success');
+                closeAddressForm();
+                loadShippingAddresses();
+            } else {
+                showH5Toast('保存失败', 'error');
+            }
+        }
+
+        // ========== 设置 ==========
+        function showChangePasswordForm() {
+            const html = `<div class="form-overlay" id="pwdFormOverlay">
+                <div class="form-modal">
+                    <div class="form-title">修改密码</div>
+                    <div class="form-body">
+                        <div class="form-group"><label>原密码</label><input id="oldPwd" type="password" placeholder="请输入原密码"></div>
+                        <div class="form-group"><label>新密码</label><input id="newPwd" type="password" placeholder="请输入新密码（6位以上）"></div>
+                        <div class="form-group"><label>确认新密码</label><input id="confirmPwd" type="password" placeholder="请再次输入新密码"></div>
+                    </div>
+                    <div class="form-footer">
+                        <button class="btn-cancel" onclick="document.getElementById(\'pwdFormOverlay\').remove()">取消</button>
+                        <button class="btn-submit" onclick="submitChangePassword()">确认修改</button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        async function submitChangePassword() {
+            const oldP = document.getElementById('oldPwd').value;
+            const newP = document.getElementById('newPwd').value;
+            const confirmP = document.getElementById('confirmPwd').value;
+            if (!oldP || !newP || !confirmP) { showH5Toast('请填写完整', 'error'); return; }
+            if (newP !== confirmP) { showH5Toast('两次密码不一致', 'error'); return; }
+            if (newP.length < 6) { showH5Toast('密码至少6位', 'error'); return; }
+            showH5Toast('密码修改成功（演示模式）', 'success');
+            document.getElementById('pwdFormOverlay').remove();
+        }
+        function clearCache() {
+            if (!confirm('确认清除缓存？')) return;
+            // 模拟清除缓存
+            const sizeEl = document.getElementById('cacheSize');
+            if (sizeEl) sizeEl.textContent = '当前 0 MB';
+            showH5Toast('缓存已清除', 'success');
+        }
+        function logoutApp() {
+            if (!confirm('确认退出登录？')) return;
+            showH5Toast('已退出登录（演示模式）', 'info');
+        }
+
+        // ========== 页面加载时初始化 ==========
+        const _origShowPage = showPage;
 
         // ========== SOS ==========
         async function triggerSOS() {
