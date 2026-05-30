@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+env/
+*.egg-info/
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# 备份文件
+*.bak
+*.production
+*.proDUCTION.bak
+
+# 临时/多余文件
+deploy/
+prototype.html
+智慧社区高保真原型.zip
+
+# 系统文件
+.DS_Store
+Thumbs.db

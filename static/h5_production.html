@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>智慧社区 - 居民端</title>
+    <link rel="stylesheet" href="design-system.css">
+    <style>
+        /* ========== 智慧社区居民端 - Mobile UI ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+            padding-bottom: calc(70px + env(safe-area-inset-bottom));
+            -webkit-font-smoothing: antialiased;
+        }
+        .phone-frame { max-width: 430px; margin: 0 auto; background: var(--color-white); min-height: 100vh; position: relative; }
+
+        /* --- 状态栏 --- */
+        .status-bar {
+            height: 44px;
+            background: var(--color-primary-gradient);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; color: white; font-size: 12px; font-weight: 500;
+        }
+        .status-bar-time { font-weight: 600; font-variant-numeric: tabular-nums; }
+        .status-icons { display: flex; gap: 5px; font-size: 14px; }
+
+        /* --- 头部区域 --- */
+        .header {
+            background: var(--color-primary-gradient);
+            padding: 16px 16px 28px; color: white; position: relative; overflow: hidden;
+        }
+        .header::after {
+            content: ''; position: absolute; top: -30%; right: -8%;
+            width: 140px; height: 140px; border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .header-title { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
+        .header-back {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: rgba(255,255,255,0.15); cursor: pointer;
+            font-size: 18px; transition: background 0.15s;
+        }
+        .header-back:active { background: rgba(255,255,255,0.25); }
+        .header-content { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+        .user-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;
+            font-size: 22px; border: 2px solid rgba(255,255,255,0.3);
+        }
+        .user-info h2 { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+        .user-info p { font-size: 13px; opacity: 0.85; line-height: 1.4; }
+        .switch-admin-btn {
+            margin-left: auto; font-size: 11px;
+            background: rgba(255,255,255,0.15); padding: 5px 10px;
+            border-radius: 20px; cursor: pointer; white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .switch-admin-btn:active { background: rgba(255,255,255,0.25); }
+
+        /* --- Banner 轮播 --- */
+        .banner { padding: 12px 16px; }
+        .banner-slide {
+            height: 110px; border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 15px; font-weight: 600;
+            position: relative; overflow: hidden;
+        }
+        .banner-slide::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 100%);
+        }
+        .banner-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .banner-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .banner-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        /* --- 功能入口网格 --- */
+        .quick-nav {
+            padding: 16px; display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px 12px;
+        }
+        .quick-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            cursor: pointer; transition: transform 0.15s;
+        }
+        .quick-item:active { transform: scale(0.92); }
+        .quick-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; transition: transform 0.2s;
+        }
+        .quick-item:hover .quick-icon { transform: scale(1.05); }
+        .quick-name { font-size: 11px; color: var(--color-text-secondary); font-weight: 500; }
+
+        /* --- 内容区块 --- */
+        .content { padding: 0 16px 16px; }
+        .section { margin-bottom: 16px; }
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0;
+        }
+        .section-title {
+            font-size: 16px; font-weight: 700; color: var(--color-text-primary);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .section-more { font-size: 13px; color: var(--color-primary); cursor: pointer; font-weight: 500; }
+        .section-more:active { opacity: 0.7; }
+
+        /* --- 公告列表 --- */
+        .notice-list { background: var(--color-white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-xs); }
+        .notice-item {
+            padding: 13px 16px; border-bottom: 1px solid #f0f0f0;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .notice-item:last-child { border-bottom: none; }
+        .notice-item:active { background: var(--color-bg-light); }
+        .notice-title {
+            font-size: 14px; color: var(--color-text-primary); margin-bottom: 5px;
+            display: flex; align-items: center; gap: 8px; font-weight: 500;
+        }
+        .notice-tag {
+            font-size: 10px; padding: 2px 6px; border-radius: var(--radius-pill);
+            font-weight: 600; flex-shrink: 0;
+        }
+        .notice-tag.urgent { background: var(--color-danger-light); color: var(--color-danger); }
+        .notice-tag.normal { background: var(--color-primary-light); color: var(--color-primary); }
+        .notice-tag.activity { background: var(--color-success-light); color: var(--color-success); }
+        .notice-time { font-size: 12px; color: var(--color-text-tertiary); }
+
+        /* --- 订单卡片 --- */
+        .order-card {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            padding: 14px 16px; margin-bottom: 10px;
+            box-shadow: var(--shadow-xs); transition: transform 0.15s;
+        }
+        .order-card:active { transform: scale(0.99); }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .order-type { font-size: 14px; font-weight: 600; }
+        .order-status { font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill); font-weight: 500; }
+        .order-status.pending { background: var(--color-warning-light); color: var(--color-warning); }
+        .order-status.completed { background: var(--color-success-light); color: var(--color-success); }
+        .order-status.processing { background: var(--color-info-light); color: var(--color-info); }
+        .order-info { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+        .order-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0f0f0;
+        }
+        .order-time { font-size: 12px; color: var(--color-text-tertiary); }
+        .order-price { font-size: 15px; font-weight: 700; color: var(--color-danger); }
+
+        /* --- 底部 Tab 栏 --- */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            max-width: 430px; margin: 0 auto;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+            box-shadow: 0 -1px 16px rgba(0,0,0,0.04); z-index: 100;
+            border-top: 0.5px solid rgba(0,0,0,0.04);
+        }
+        .tab-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            gap: 2px; cursor: pointer; color: var(--color-text-tertiary);
+            font-size: 10px; transition: all 0.2s; padding: 4px 0; position: relative;
+        }
+        .tab-item.active { color: var(--color-primary); }
+        .tab-item.active::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 3px; background: var(--color-primary);
+            border-radius: 0 0 3px 3px;
+        }
+        .tab-icon { font-size: 22px; transition: transform 0.2s; }
+        .tab-item.active .tab-icon { transform: scale(1.08); }
+
+        /* --- 页面切换 --- */
+        .page { display: none; }
+        .page.active { display: block; animation: pageFadeIn 0.25s ease-out; }
+        @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 服务页面 --- */
+        .service-category { padding: 12px 16px; }
+        .category-list { display: flex; flex-direction: column; gap: 12px; }
+        .category-item {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            padding: 16px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: var(--shadow-xs);
+        }
+        .category-item:active { transform: scale(0.98); box-shadow: var(--shadow-sm); }
+        .category-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .category-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .category-info h3 { font-size: 15px; color: var(--color-text-primary); font-weight: 600; margin-bottom: 2px; }
+        .category-info p { font-size: 12px; color: var(--color-text-tertiary); }
+        .service-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .service-tag {
+            background: var(--color-bg-light); padding: 5px 10px;
+            border-radius: 20px; font-size: 12px; color: var(--color-text-secondary);
+        }
+
+        /* --- 消息页面 --- */
+        .msg-category {
+            display: flex; padding: 12px 16px; gap: 8px; overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .msg-category::-webkit-scrollbar { display: none; }
+        .msg-tab {
+            padding: 7px 14px; background: var(--color-bg-light);
+            border-radius: 20px; font-size: 13px; white-space: nowrap; cursor: pointer;
+            color: var(--color-text-secondary); transition: all 0.15s; font-weight: 500;
+        }
+        .msg-tab.active { background: var(--color-primary); color: white; box-shadow: var(--shadow-primary); }
+        .msg-list { padding: 0 16px; }
+        .msg-item {
+            display: flex; gap: 12px; padding: 14px 0;
+            border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background 0.15s;
+        }
+        .msg-item:active { background: var(--color-bg-light); }
+        .msg-icon-wrap {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .msg-content { flex: 1; min-width: 0; }
+        .msg-title {
+            font-size: 14px; font-weight: 600; color: var(--color-text-primary);
+            margin-bottom: 3px; display: flex; justify-content: space-between;
+        }
+        .msg-time { font-size: 11px; color: var(--color-text-tertiary); font-weight: 400; }
+        .msg-desc { font-size: 12px; color: var(--color-text-tertiary); line-height: 1.4; }
+
+        /* --- 我的页面 --- */
+        .my-header {
+            background: var(--color-primary-gradient); padding: 24px 16px 36px;
+            color: white; position: relative; overflow: hidden;
+        }
+        .my-header::after {
+            content: ''; position: absolute; bottom: -20%; right: -5%;
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .my-user { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+        .my-avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;
+            font-size: 28px; border: 2px solid rgba(255,255,255,0.3);
+        }
+        .my-info h2 { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .my-info p { color: rgba(255,255,255,0.8); font-size: 13px; }
+        .my-menu {
+            margin: -20px 16px 0; background: var(--color-white);
+            border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);
+            position: relative; z-index: 2;
+        }
+        .menu-item {
+            display: flex; align-items: center; padding: 14px 16px;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .menu-item:active { background: var(--color-bg-light); }
+        .menu-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; margin-right: 12px; flex-shrink: 0;
+        }
+        .menu-text { flex: 1; font-size: 15px; color: var(--color-text-primary); font-weight: 500; }
+        .menu-arrow { color: #ccc; font-size: 14px; }
+        .logout-btn {
+            display: block; width: calc(100% - 32px); margin: 20px 16px;
+            padding: 13px; background: var(--color-danger-light); color: var(--color-danger);
+            text-align: center; border-radius: var(--radius-md); font-size: 15px;
+            font-weight: 500; cursor: pointer; border: none; font-family: var(--font-family);
+        }
+        .logout-btn:active { opacity: 0.8; }
+
+        /* --- 表单样式 --- */
+        .form-card {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-xs);
+        }
+        .form-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--color-text-primary); }
+        .form-row { margin-bottom: 14px; }
+        .form-label {
+            font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px;
+            font-weight: 500; display: block;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 11px 12px; border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm); font-size: 14px; font-family: var(--font-family);
+            outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+            -webkit-appearance: none; appearance: none; background: var(--color-white);
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+        }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .submit-btn {
+            width: 100%; padding: 14px; background: var(--color-primary-gradient);
+            color: white; border: none; border-radius: 25px; font-size: 16px;
+            font-weight: 600; cursor: pointer; box-shadow: var(--shadow-primary);
+            transition: all 0.15s; font-family: var(--font-family);
+        }
+        .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* --- 社区医生页面（H5）--- */
+        .doc-tab-bar {
+            display: flex; overflow-x: auto; padding: 8px 12px; gap: 8px;
+            background: var(--color-white); border-bottom: 1px solid #f0f0f0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .doc-tab-bar::-webkit-scrollbar { display: none; }
+        .doc-tab {
+            flex-shrink: 0; padding: 7px 14px; background: var(--color-bg-light);
+            border-radius: 20px; font-size: 13px; color: var(--color-text-secondary);
+            white-space: nowrap; cursor: pointer; transition: all 0.15s; font-weight: 500;
+        }
+        .doc-tab.active { background: var(--color-primary); color: white; }
+        .doctor-list { display: flex; flex-direction: column; gap: 12px; padding: 12px 16px; }
+        .doctor-card {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            padding: 16px; display: flex; gap: 12px;
+            box-shadow: var(--shadow-xs); transition: transform 0.15s;
+        }
+        .doctor-card:active { transform: scale(0.98); }
+        .doctor-avatar-lg {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary-light) 0%, #bae7ff 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; flex-shrink: 0;
+        }
+        .doctor-info { flex: 1; min-width: 0; }
+        .doctor-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+        .doctor-name { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+        .doctor-title-tag {
+            font-size: 10px; padding: 2px 6px; border-radius: var(--radius-pill);
+            background: var(--color-primary-light); color: var(--color-primary); font-weight: 500;
+        }
+        .doctor-dept { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+        .doctor-stats { display: flex; gap: 12px; font-size: 11px; color: var(--color-text-tertiary); }
+        .doctor-stats span { display: flex; align-items: center; gap: 3px; }
+        .doctor-sign-btn {
+            align-self: center; padding: 8px 16px;
+            background: var(--color-primary-gradient); color: white;
+            border: none; border-radius: 20px; font-size: 12px; font-weight: 600;
+            cursor: pointer; white-space: nowrap; transition: all 0.15s;
+            font-family: var(--font-family);
+        }
+        .doctor-sign-btn:active { opacity: 0.9; transform: scale(0.97); }
+        .doctor-sign-btn.expired { background: #ccc; }
+
+        /* --- SOS 按钮 --- */
+        .sos-btn {
+            width: 100%; padding: 40px 20px;
+            background: linear-gradient(135deg, var(--color-danger) 0%, #cf1322 100%);
+            color: white; border: none; border-radius: var(--radius-xl);
+            font-size: 20px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 6px 24px rgba(255,77,79,0.35);
+            transition: all 0.15s; letter-spacing: 1px; font-family: var(--font-family);
+        }
+        .sos-btn:active { transform: scale(0.97); }
+
+        /* --- SOS 覆盖层 --- */
+        .sos-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,0,0,0.92); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            flex-direction: column; color: white; animation: sosFadeIn 0.3s ease;
+        }
+        .sos-overlay.show { display: flex; }
+        @keyframes sosFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .sos-ring {
+            width: 180px; height: 180px; border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            animation: sosRingPulse 1.2s ease-in-out infinite;
+        }
+        @keyframes sosRingPulse {
+            0% { transform: scale(0.85); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.7; }
+            100% { transform: scale(0.85); opacity: 1; }
+        }
+        .sos-ring-inner {
+            width: 130px; height: 130px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 48px;
+        }
+        .sos-text { font-size: 22px; font-weight: 700; margin-top: 28px; }
+        .sos-desc { font-size: 14px; margin-top: 12px; opacity: 0.8; }
+        .sos-cancel {
+            margin-top: 36px; padding: 12px 40px;
+            background: rgba(255,255,255,0.15); color: white;
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 25px;
+            font-size: 15px; cursor: pointer; transition: all 0.15s; font-family: var(--font-family);
+        }
+        .sos-cancel:active { background: rgba(255,255,255,0.25); }
+
+        /* --- API 状态指示器 --- */
+        .api-status {
+            position: fixed; top: 10px; right: 16px; max-width: 430px; z-index: 1001;
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+            padding: 5px 10px; border-radius: 20px; box-shadow: var(--shadow-sm);
+            font-size: 11px; transition: all 0.2s;
+        }
+        .api-status-dot { width: 7px; height: 7px; border-radius: 50%; }
+        .api-status.connected .api-status-dot { background: var(--color-success); }
+        .api-status.disconnected .api-status-dot { background: var(--color-danger); }
+        .api-status.demo .api-status-dot { background: var(--color-warning); }
+
+        /* --- Toast 提示 --- */
+        .h5-toast {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.78); color: white; padding: 14px 28px;
+            border-radius: var(--radius-md); font-size: 14px; z-index: 10001;
+            text-align: center; min-width: 180px; backdrop-filter: blur(4px);
+            animation: toastPop 0.25s ease-out;
+        }
+        @keyframes toastPop { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+        .h5-toast.success { background: linear-gradient(135deg, rgba(82,196,26,0.9) 0%, rgba(56,158,13,0.9) 100%); }
+        .h5-toast.error { background: linear-gradient(135deg, rgba(255,77,79,0.9) 0%, rgba(207,19,34,0.9) 100%); }
+
+        /* --- 切换管理端悬浮按钮 --- */
+        .switch-admin-fixed { position: fixed; top: 50px; right: 16px; max-width: 430px; z-index: 1000; }
+        .switch-admin-link {
+            display: flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, var(--color-success) 0%, #389e0d 100%);
+            color: white; padding: 7px 12px; border-radius: 20px; font-size: 12px;
+            box-shadow: 0 2px 10px rgba(82,196,26,0.3); cursor: pointer;
+            transition: all 0.2s; font-weight: 500; text-decoration: none;
+        }
+        .switch-admin-link:active { transform: scale(0.96); }
+
+        /* --- 演示引导弹窗 --- */
+        .guide-popup {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 9000;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .guide-content {
+            background: var(--color-white); border-radius: var(--radius-xl);
+            width: 320px; max-width: 90%; padding: 28px 24px;
+            text-align: center; box-shadow: var(--shadow-xl);
+            animation: guidePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes guidePop { from { opacity: 0; transform: scale(0.9) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .guide-icon { font-size: 48px; margin-bottom: 16px; }
+        .guide-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .guide-desc { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.6; }
+        .guide-btn {
+            width: 100%; padding: 12px; background: var(--color-primary-gradient);
+            color: white; border: none; border-radius: var(--radius-md); font-size: 15px;
+            cursor: pointer; font-weight: 600; transition: all 0.15s; font-family: var(--font-family);
+        }
+        .guide-btn:active { transform: scale(0.97); opacity: 0.9; }
+    </style>
+    <script src="mock.js"></script>
+</head>
+<body>
+    <!-- API 连接状态 -->
+    <div class="api-status demo" id="apiStatus">
+        <span class="api-status-dot"></span>
+        <span id="apiStatusText">演示模式</span>
+    </div>
+
+    <!-- 切换到管理端 -->
+    <div class="switch-admin-fixed">
+        <a class="switch-admin-link" href="index.html">🖥️ 管理后台</a>
+    </div>
+
+    <!-- SOS 紧急呼叫覆盖层 -->
+    <div class="sos-overlay" id="sosOverlay">
+        <div class="sos-ring">
+            <div class="sos-ring-inner">🆘</div>
+        </div>
+        <div class="sos-text">紧急呼叫已发送</div>
+        <div class="sos-desc">物业人员正在赶来，请保持电话畅通</div>
+        <button class="sos-cancel" onclick="closeSOSOverlay()">取消呼叫</button>
+    </div>
+
+    <!-- ========== 首页 ========== -->
+    <div class="phone-frame">
+        <div class="page active" id="page-home">
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <span class="status-bar-time" id="statusTime">9:41</span>
+                <div class="status-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+
+            <!-- 头部 -->
+            <div class="header">
+                <div class="header-top">
+                    <span class="header-title">🏠 智慧社区</span>
+                </div>
+                <div class="header-content">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-info">
+                        <h2>李明华</h2>
+                        <p>东湖社区 · 碧水园3栋2单元1501</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner -->
+            <div class="banner">
+                <div class="banner-slide banner-1">🎉 社区乒乓球比赛开始报名！</div>
+            </div>
+
+            <!-- 快捷功能 -->
+            <div class="quick-nav">
+                <div class="quick-item" onclick="showPage('service','housekeeping')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);">🧹</div>
+                    <span class="quick-name">家政预约</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','canteen')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);">🍽️</div>
+                    <span class="quick-name">社区食堂</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','property')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);">💰</div>
+                    <span class="quick-name">物业缴费</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','repair')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%);">🔧</div>
+                    <span class="quick-name">报修申请</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','visitor')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #f9f0ff 0%, #d3adf7 100%);">👥</div>
+                    <span class="quick-name">访客邀请</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','parking')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #e6fffb 0%, #87e8de 100%);">🚗</div>
+                    <span class="quick-name">车位查询</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','health')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #fff0f6 0%, #ffadd2 100%);">🏥</div>
+                    <span class="quick-name">社区医生</span>
+                </div>
+                <div class="quick-item" onclick="showPage('service','more')">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);">📋</div>
+                    <span class="quick-name">更多服务</span>
+                </div>
+            </div>
+
+            <!-- 社区公告 -->
+            <div class="content">
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-title">📢 社区公告</span>
+                        <span class="section-more" onclick="showPage('msg')">查看更多 ></span>
+                    </div>
+                    <div class="notice-list">
+                        <div class="notice-item">
+                            <div class="notice-title">
+                                <span class="notice-tag urgent">紧急</span>
+                                关于防范电动车火灾的通知
+                            </div>
+                            <div class="notice-time">2026-05-26</div>
+                        </div>
+                        <div class="notice-item">
+                            <div class="notice-title">
+                                <span class="notice-tag activity">活动</span>
+                                乒乓球比赛报名进行中，奖品丰厚！
+                            </div>
+                            <div class="notice-time">2026-05-25</div>
+                        </div>
+                        <div class="notice-item">
+                            <div class="notice-title">
+                                <span class="notice-tag normal">物业</span>
+                                5月份物业费缴费通知
+                            </div>
+                            <div class="notice-time">2026-05-24</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近服务 -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-title">📋 最近服务</span>
+                        <span class="section-more" onclick="showPage('my')">我的订单 ></span>
+                    </div>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-type">🧹 日常保洁</span>
+                            <span class="order-status processing">服务中</span>
+                        </div>
+                        <div class="order-info">预约时间：2026-05-27 14:00-16:00</div>
+                        <div class="order-footer">
+                            <span class="order-time">2026-05-26 10:30 下单</span>
+                        </div>
+                    </div>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-type">🍽️ 社区食堂</span>
+                            <span class="order-status completed">已完成</span>
+                        </div>
+                        <div class="order-info">红烧肉、清炒时蔬、米饭</div>
+                        <div class="order-footer">
+                            <span class="order-time">2026-05-26 11:20 下单</span>
+                            <span class="order-price">¥38</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 服务页面 ========== -->
+        <div class="page" id="page-service">
+            <div class="status-bar">
+                <span class="status-bar-time">9:41</span>
+                <div class="status-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-back" onclick="showPage('home')">←</div>
+                    <span class="header-title" id="serviceTitle">服务预约</span>
+                </div>
+            </div>
+            <div class="detail-content" id="serviceContent" style="padding:16px;">
+                <!-- 动态加载服务内容 -->
+                <div class="empty-state" style="padding:40px 20px;">
+                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-title">请选择服务类型</div>
+                    <div class="empty-state-desc">从首页快捷入口选择您需要的生活服务</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 消息页面 ========== -->
+        <div class="page" id="page-msg">
+            <div class="status-bar">
+                <span class="status-bar-time">9:41</span>
+                <div class="status-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-back" onclick="showPage('home')">←</div>
+                    <span class="header-title">📬 消息中心</span>
+                </div>
+            </div>
+            <div class="msg-category">
+                <div class="msg-tab active" onclick="switchMsgTab(this,'all')">全部</div>
+                <div class="msg-tab" onclick="switchMsgTab(this,'fee')">缴费提醒</div>
+                <div class="msg-tab" onclick="switchMsgTab(this,'repair')">报修进度</div>
+                <div class="msg-tab" onclick="switchMsgTab(this,'activity')">活动通知</div>
+                <div class="msg-tab" onclick="switchMsgTab(this,'system')">系统消息</div>
+            </div>
+            <div class="msg-list">
+                <div class="msg-item">
+                    <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);">💰</div>
+                    <div class="msg-content">
+                        <div class="msg-title">物业费待缴费提醒 <span class="msg-time">今天</span></div>
+                        <div class="msg-desc">您2026年5月的物业费298元待缴纳，请及时处理。</div>
+                    </div>
+                </div>
+                <div class="msg-item">
+                    <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);">🔧</div>
+                    <div class="msg-content">
+                        <div class="msg-title">报修进度更新 <span class="msg-time">昨天</span></div>
+                        <div class="msg-desc">您的卫生间水管报修已派单，维修师傅将于明天上门。</div>
+                    </div>
+                </div>
+                <div class="msg-item">
+                    <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);">🎉</div>
+                    <div class="msg-content">
+                        <div class="msg-title">社区活动通知 <span class="msg-time">3天前</span></div>
+                        <div class="msg-desc">社区乒乓球比赛将于6月1日在活动中心举行，欢迎参加！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 我的页面 ========== -->
+        <div class="page" id="page-my">
+            <div class="my-header">
+                <div class="my-user">
+                    <div class="my-avatar">👤</div>
+                    <div class="my-info">
+                        <h2>李明华</h2>
+                        <p>东湖社区 · 碧水园3栋2单元1501</p>
+                    </div>
+                </div>
+            </div>
+            <div class="my-menu">
+                <div class="menu-item" onclick="showPage('my-orders')">
+                    <div class="menu-icon" style="background: var(--color-primary-light); color: var(--color-primary);">📋</div>
+                    <span class="menu-text">我的订单</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item" onclick="showPage('my-health')">
+                    <div class="menu-icon" style="background: var(--color-danger-light); color: var(--color-danger);">❤️</div>
+                    <span class="menu-text">健康档案</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item" onclick="showPage('my-family')">
+                    <div class="menu-icon" style="background: var(--color-success-light); color: var(--color-success);">👨👩👧</div>
+                    <span class="menu-text">家庭成员</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item" onclick="showPage('my-address')">
+                    <div class="menu-icon" style="background: var(--color-purple-light); color: var(--color-purple);">🏠</div>
+                    <span class="menu-text">收货地址</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item" onclick="showPage('my-settings')">
+                    <div class="menu-icon" style="background: var(--color-bg-light); color: var(--color-text-tertiary);">⚙️</div>
+                    <span class="menu-text">设置</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <!-- 底部 Tab 栏 -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('home',this)">
+            <div class="tab-icon">🏠</div>
+            <span>首页</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('service-all',this)">
+            <div class="tab-icon">📋</div>
+            <span>服务</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('msg',this)">
+            <div class="tab-icon">📬</div>
+            <span>消息</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('my',this)">
+            <div class="tab-icon">👤</div>
+            <span>我的</span>
+        </div>
+    </div>
+
+    <script>
+        // ========== API 配置 ==========
+        const API_BASE = '/';
+
+        async function api(path, options = {}) {
+            try {
+                const res = await fetch(API_BASE + path.replace(/^\//, ''), {
+                    headers: { 'Content-Type': 'application/json', ...options.headers },
+                    ...options
+                });
+                return await res.json();
+            } catch(e) {
+                console.error('API error:', path, e);
+                return null;
+            }
+        }
+
+        async function checkBackend() {
+            try {
+                const res = await fetch(API_BASE + 'api/housekeeping/orders?_=' + Date.now(), { method: 'GET' });
+                if (res.ok) {
+                    const statusEl = document.getElementById('apiStatus');
+                    const textEl = document.getElementById('apiStatusText');
+                    if (statusEl && textEl) {
+                        statusEl.className = 'api-status online';
+                        textEl.textContent = '已连接';
+                    }
+                    return true;
+                }
+            } catch(e) {}
+            const statusEl = document.getElementById('apiStatus');
+            const textEl = document.getElementById('apiStatusText');
+            if (statusEl && textEl) {
+                statusEl.className = 'api-status demo';
+                textEl.textContent = '演示模式';
+            }
+            return false;
+        }
+
+        // ========== 页面路由 ==========
+        function showPage(pageId, param) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            const page = document.getElementById('page-' + pageId);
+            if (page) {
+                page.classList.add('active');
+                page.style.animation = 'none';
+                page.offsetHeight;
+                page.style.animation = '';
+            }
+            if (param) {
+                const title = document.getElementById('serviceTitle');
+                if (title) {
+                    const names = { housekeeping:'家政服务', canteen:'社区食堂', property:'物业缴费', repair:'报修服务', visitor:'访客管理', parking:'车位服务', health:'健康服务', more:'更多服务' };
+                    title.textContent = '📋 ' + (names[param] || '服务预约');
+                }
+            }
+            if (pageId === 'home') loadHomeData();
+            if (pageId === 'service' && param) loadServiceContent(param);
+        }
+
+        function switchTab(pageId, tabEl) {
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            if (tabEl) tabEl.classList.add('active');
+            showPage(pageId);
+        }
+
+        function switchMsgTab(el, type) {
+            document.querySelectorAll('.msg-tab').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // ========== SOS ==========
+        function closeSOSOverlay() {
+            document.getElementById('sosOverlay').classList.remove('show');
+        }
+
+        // ========== 状态栏时间 ==========
+        function updateStatusTime() {
+            const now = new Date();
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const el = document.getElementById('statusTime');
+            if (el) el.textContent = h + ':' + m;
+        }
+        updateStatusTime();
+        setInterval(updateStatusTime, 30000);
+
+        // ========== 加载首页数据 ==========
+        async function loadHomeData() {
+            const online = await checkBackend();
+            if (!online) return;
+            try {
+                const res = await api('api/announcements');
+                if (res && res.code === 0 && res.data) {
+                    updateNotices(res.data.slice(0, 3));
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function updateNotices(notices) {
+            const list = document.querySelector('.notice-list');
+            if (!list || !notices || notices.length === 0) return;
+            list.innerHTML = notices.map(n => `
+                <div class="notice-item">
+                    <div class="notice-title">
+                        <span class="notice-tag ${n.type === 'urgent' ? 'urgent' : n.type === 'activity' ? 'activity' : 'normal'}">${n.type === 'urgent' ? '紧急' : n.type === 'activity' ? '活动' : '物业'}</span>
+                        ${n.title}
+                    </div>
+                    <div class="notice-time">${n.date || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        // ========= 加载服务内容 =========
+        function loadServiceContent(type) {
+            const content = document.getElementById('serviceContent');
+            if (!content) return;
+            let html = '';
+            if (type === 'housekeeping') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">🧹 家政预约</div>' +
+                    '<div class="form-row"><label class="form-label">服务类型</label>' +
+                    '<select class="form-select" id="hkType">' +
+                    '<option value="日常保洁">日常保洁</option>' +
+                    '<option value="大扫除">大扫除</option>' +
+                    '<option value="照顾老人">照顾老人</option>' +
+                    '<option value="照顾小孩">照顾小孩</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">预约日期</label>' +
+                    '<input type="date" class="form-input" id="hkDate"></div>' +
+                    '<div class="form-row"><label class="form-label">预约时间</label>' +
+                    '<select class="form-select" id="hkTime">' +
+                    '<option value="08:00-10:00">08:00-10:00</option>' +
+                    '<option value="10:00-12:00">10:00-12:00</option>' +
+                    '<option value="14:00-16:00">14:00-16:00</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">联系人</label>' +
+                    '<input type="text" class="form-input" id="hkName" value="李明华"></div>' +
+                    '<div class="form-row"><label class="form-label">联系电话</label>' +
+                    '<input type="tel" class="form-input" id="hkPhone" value="13812345678"></div>' +
+                    '<div class="form-row"><label class="form-label">服务地址</label>' +
+                    '<input type="text" class="form-input" id="hkAddress" value="碧水园3栋2单元1501"></div>' +
+                    '<button class="submit-btn" onclick="submitHousekeeping()">提交预约</button>' +
+                    '</div>';
+            } else if (type === 'canteen') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">🍽️ 社区食堂</div>' +
+                    '<div class="form-row"><label class="form-label">用餐类型</label>' +
+                    '<select class="form-select" id="ctType">' +
+                    '<option value="堂食">堂食</option>' +
+                    '<option value="打包">打包</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">用餐时间</label>' +
+                    '<input type="datetime-local" class="form-input" id="ctTime"></div>' +
+                    '<div class="form-row"><label class="form-label">人数</label>' +
+                    '<input type="number" class="form-input" id="ctPeople" value="1" min="1"></div>' +
+                    '<button class="submit-btn" onclick="submitCanteen()">提交订单</button>' +
+                    '</div>';
+            } else if (type === 'repair') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">🔧 报修申请</div>' +
+                    '<div class="form-row"><label class="form-label">报修类型</label>' +
+                    '<select class="form-select" id="rpType">' +
+                    '<option value="水管维修">水管维修</option>' +
+                    '<option value="电路维修">电路维修</option>' +
+                    '<option value="门窗维修">门窗维修</option>' +
+                    '<option value="其他">其他</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">问题描述</label>' +
+                    '<textarea class="form-textarea" id="rpDesc" placeholder="请描述具体问题"></textarea></div>' +
+                    '<div class="form-row"><label class="form-label">预约时间</label>' +
+                    '<input type="datetime-local" class="form-input" id="rpTime"></div>' +
+                    '<div class="form-row"><label class="form-label">联系人</label>' +
+                    '<input type="text" class="form-input" id="rpName" value="李明华"></div>' +
+                    '<div class="form-row"><label class="form-label">联系电话</label>' +
+                    '<input type="tel" class="form-input" id="rpPhone" value="13812345678"></div>' +
+                    '<button class="submit-btn" onclick="submitRepair()">提交报修</button>' +
+                    '</div>';
+            } else if (type === 'property') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">💰 物业缴费</div>' +
+                    '<div class="form-row"><label class="form-label">缴费项目</label>' +
+                    '<select class="form-select" id="pfType">' +
+                    '<option value="物业费">物业费</option>' +
+                    '<option value="水费">水费</option>' +
+                    '<option value="电费">电费</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">缴费周期</label>' +
+                    '<input type="month" class="form-input" id="pfMonth"></div>' +
+                    '<button class="submit-btn" onclick="submitProperty()">查询账单</button>' +
+                    '</div>';
+            } else if (type === 'visitor') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">👥 访客邀请</div>' +
+                    '<div class="form-row"><label class="form-label">访客姓名</label>' +
+                    '<input type="text" class="form-input" id="vsName" placeholder="请输入访客姓名"></div>' +
+                    '<div class="form-row"><label class="form-label">来访时间</label>' +
+                    '<input type="datetime-local" class="form-input" id="vsTime"></div>' +
+                    '<div class="form-row"><label class="form-label">车牌号</label>' +
+                    '<input type="text" class="form-input" id="vsPlate" placeholder="粤A12345（选填）"></div>' +
+                    '<button class="submit-btn" onclick="submitVisitor()">发送邀请</button>' +
+                    '</div>';
+            } else if (type === 'health') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">💊 健康服务</div>' +
+                    '<div class="form-row"><label class="form-label">服务类型</label>' +
+                    '<select class="form-select" id="htType">' +
+                    '<option value="在线问诊">在线问诊</option>' +
+                    '<option value="健康体检">健康体检</option>' +
+                    '<option value="慢病管理">慢病管理</option>' +
+                    '<option value="送药上门">送药上门</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">预约日期</label>' +
+                    '<input type="date" class="form-input" id="htDate"></div>' +
+                    '<div class="form-row"><label class="form-label">预约时间</label>' +
+                    '<select class="form-select" id="htTime">' +
+                    '<option value="08:00-10:00">08:00-10:00</option>' +
+                    '<option value="10:00-12:00">10:00-12:00</option>' +
+                    '<option value="14:00-16:00">14:00-16:00</option>' +
+                    '<option value="16:00-18:00">16:00-18:00</option>' +
+                    '</select></div>' +
+                    '<div class="form-row"><label class="form-label">联系人</label>' +
+                    '<input type="text" class="form-input" id="htName" value="李明华"></div>' +
+                    '<div class="form-row"><label class="form-label">联系电话</label>' +
+                    '<input type="tel" class="form-input" id="htPhone" value="13812345678"></div>' +
+                    '<div class="form-row"><label class="form-label">详细地址</label>' +
+                    '<input type="text" class="form-input" id="htAddress" value="碧水园3栋2单元1501"></div>' +
+                    '<button class="submit-btn" onclick="submitHealth()">提交预约</button>' +
+                    '</div>';
+            } else {
+                html = '<div class="form-card"><div class="form-title">🚧 开发中</div><p style="padding:16px;color:#999;">该功能正在开发中，敬请期待！</p></div>';
+            }
+            content.innerHTML = html;
+        }
+        // ========== 表单提交 ==========
+        async function submitHousekeeping() {
+            const online = await checkBackend();
+            if (!online) { showH5Toast('演示模式：预约已提交', 'info'); return; }
+            const data = {
+                service_type: document.getElementById('hkType').value,
+                book_date: document.getElementById('hkDate').value,
+                book_time: document.getElementById('hkTime').value,
+                contact_name: document.getElementById('hkName').value,
+                contact_phone: document.getElementById('hkPhone').value,
+                address: document.getElementById('hkAddress').value,
+            };
+            const res = await api('api/housekeeping/orders', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) { showH5Toast('预约成功！', 'success'); }
+            else { showH5Toast('预约失败，请重试', 'error'); }
+        }
+
+        async function submitCanteen() {
+            const online = await checkBackend();
+            if (!online) { showH5Toast('演示模式：订单已提交', 'info'); return; }
+            const data = {
+                order_type: document.getElementById('ctType').value,
+                book_time: document.getElementById('ctTime').value,
+                people_count: parseInt(document.getElementById('ctPeople').value) || 1,
+            };
+            const res = await api('api/canteen/orders', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) { showH5Toast('订单提交成功！', 'success'); }
+            else { showH5Toast('提交失败，请重试', 'error'); }
+        }
+
+        async function submitRepair() {
+            const online = await checkBackend();
+            if (!online) { showH5Toast('演示模式：报修已提交', 'info'); return; }
+            const data = {
+                repair_type: document.getElementById('rpType').value,
+                description: document.getElementById('rpDesc').value,
+                book_time: document.getElementById('rpTime').value,
+                contact_name: document.getElementById('rpName').value,
+                contact_phone: document.getElementById('rpPhone').value,
+            };
+            const res = await api('api/repair/orders', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) { showH5Toast('报修提交成功！', 'success'); }
+            else { showH5Toast('提交失败，请重试', 'error'); }
+        }
+
+        async function submitProperty() {
+            const online = await checkBackend();
+            if (!online) { showH5Toast('演示模式：查询已提交', 'info'); return; }
+            showH5Toast('缴费页面开发中...', 'info');
+        }
+
+        async function submitVisitor() {
+            const online = await checkBackend();
+            if (!online) { showH5Toast('演示模式：邀请已发送', 'info'); return; }
+            const data = {
+                visitor_name: document.getElementById('vsName').value,
+                visit_time: document.getElementById('vsTime').value,
+                plate_number: document.getElementById('vsPlate').value,
+            };
+            const res = await api('api/visitor/records', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) { showH5Toast('邀请发送成功！', 'success'); }
+            else { showH5Toast('发送失败，请重试', 'error'); }
+        }
+
+        async function submitHealth() {
+            const online = await checkBackend();
+            if (!online) { showH5Toast('演示模式：预约已提交', 'info'); return; }
+            const data = {
+                service_type: document.getElementById('htType').value,
+                book_date: document.getElementById('htDate').value,
+                book_time: document.getElementById('htTime').value,
+                contact_name: document.getElementById('htName').value,
+                contact_phone: document.getElementById('htPhone').value,
+                address: document.getElementById('htAddress').value,
+            };
+            const res = await api('api/health/orders', { method: 'POST', body: JSON.stringify(data) });
+            if (res && res.code === 0) { showH5Toast('健康服务预约成功！', 'success'); }
+            else { showH5Toast('预约失败，请重试', 'error'); }
+        }
+
+        // ========== 退出登录 ==========
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                showH5Toast('已退出登录', 'success');
+            }
+        }
+
+        // ========== Toast ==========
+        function showH5Toast(message, type) {
+            const existing = document.querySelector('.h5-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'h5-toast ' + (type || 'success');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // ========== 初始化 ==========
+        checkBackend();
+        setTimeout(() => { loadHomeData(); }, 500);
+    </script>
+</body>
+</html>
