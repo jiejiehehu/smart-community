@@ -2067,6 +2067,13 @@
     <div class="help-btn" onclick="toggleHelpPanel()" title="演示帮助">❓</div>
     
     <script>
+        // 引导弹窗关闭函数（提前定义，确保 onclick 可访问）
+        window.closeGuide = function() {
+            var modal = document.getElementById('guideModal');
+            if (modal) modal.style.display = 'none';
+            localStorage.setItem('smartCommunityGuideShown', 'true');
+        };
+
         const API_BASE = '';
         let currentServiceType = 'cleaning';
         let staffList = [];
@@ -2095,10 +2102,6 @@
         });
         
         // ========== 演示引导功能 ==========
-        window.closeGuide = function() {
-            document.getElementById('guideModal').style.display = 'none';
-            localStorage.setItem('smartCommunityGuideShown', 'true');
-        }
         function toggleHelpPanel() {
             const panel = document.getElementById('helpPanel');
             panel.classList.toggle('show');
