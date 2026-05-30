@@ -652,7 +652,7 @@
 
             <!-- Banner -->
             <div class="banner">
-                <div class="banner-slide banner-1">🎉 社区乒乓球比赛开始报名！</div>
+                <div class="banner-slide banner-1" id="homeBanner" onclick="clickHomeBanner()">🎉 社区乒乓球比赛开始报名！</div>
             </div>
 
             <!-- 快捷功能 -->
@@ -797,7 +797,7 @@
                 <div class="msg-tab" onclick="switchMsgTab(this,'activity')">活动通知</div>
                 <div class="msg-tab" onclick="switchMsgTab(this,'system')">系统消息</div>
             </div>
-            <div class="msg-list">
+            <div class="msg-list" id="msgList">
                 <div class="msg-item" data-type="fee">
                     <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);">💰</div>
                     <div class="msg-content">
@@ -812,7 +812,7 @@
                         <div class="msg-desc">您的卫生间水管报修已派单，维修师傅将于明天上门。</div>
                     </div>
                 </div>
-                <div class="msg-item" data-type="activity">
+                <div class="msg-item" data-type="activity" onclick="showPage('service','more')">
                     <div class="msg-icon-wrap" style="background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);">🎉</div>
                     <div class="msg-content">
                         <div class="msg-title">社区活动通知 <span class="msg-time">3天前</span></div>
@@ -1002,7 +1002,38 @@
                 </div>
             </div>
         </div>
-<div class="page" id="page-doctor">
+
+        <!-- ========== 活动详情 ========== -->
+        <div class="page" id="page-activity-detail">
+            <div class="status-bar">
+                <span class="status-bar-time">9:41</span>
+                <div class="status-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-back" onclick="showPage('service')">←</div>
+                    <span class="header-title">🎉 活动详情</span>
+                    <div style="width:32px;"></div>
+                </div>
+            </div>
+            <div class="service-categories" style="padding:16px;">
+                <div class="form-card">
+                    <div class="form-title" id="adTitle">社区活动</div>
+                    <div style="font-size:13px;color:#666;margin-top:8px;" id="adType">类型 · 地点</div>
+                    <div style="font-size:13px;color:#666;margin-top:4px;" id="adTime">时间</div>
+                    <div style="font-size:13px;color:#666;margin-top:4px;" id="adOrganizer">主办方</div>
+                    <div style="font-size:13px;color:#666;margin-top:4px;" id="adParticipants">报名人数</div>
+                    <div style="font-size:13px;color:#666;margin-top:4px;" id="adFee">费用</div>
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eee;">
+                        <div style="font-weight:600;margin-bottom:8px;">活动详情</div>
+                        <div style="font-size:14px;color:#333;line-height:1.6;" id="adContent">暂无详情</div>
+                    </div>
+                    <button class="submit-btn" id="adRegisterBtn" onclick="registerCurrentActivity()" style="margin-top:16px;">立即报名</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page-doctor">
             <div class="header">
                 <div class="header-top">
                     <div class="header-back" onclick="showPage('home')">‹</div>
@@ -1106,6 +1137,11 @@
             if (pageId === 'my-health') loadHealthProfiles();
             if (pageId === 'my-family') loadFamilyMembers();
             if (pageId === 'my-address') loadShippingAddresses();
+            if (pageId === 'msg') loadMessages();
+            if (pageId === 'activity-detail') {
+                var backBtn = document.querySelector('#page-activity-detail .header-back');
+                if (backBtn) backBtn.onclick = function() { showPage('service'); };
+            }
         }
 
         function switchTab(pageId, tabEl) {
@@ -1122,6 +1158,81 @@
             document.querySelectorAll('.msg-item').forEach(item => {
                 item.style.display = (type === 'all' || item.dataset.type === type) ? '' : 'none';
             });
+        }
+
+        async function loadMessages() {
+            const list = document.getElementById('msgList');
+            if (!list) return;
+            try {
+                const [annRes, actRes, repairRes] = await Promise.all([
+                    api('api/announcements'),
+                    api('api/activities'),
+                    api('api/repair/orders')
+                ]);
+                let msgs = [];
+                // 公告 → 系统消息/活动通知
+                if (annRes && annRes.code === 0 && annRes.data) {
+                    annRes.data.slice(0, 5).forEach(a => {
+                        const t = a.type === 'activity' ? 'activity' : a.type === 'urgent' ? 'system' : 'fee';
+                        msgs.push({
+                            type: t,
+                            icon: t === 'activity' ? '🎉' : t === 'urgent' ? '🔔' : '📢',
+                            bg: t === 'activity' ? 'linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%)' : 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
+                            title: a.title,
+                            desc: (a.content || '').substring(0, 60),
+                            time: a.published_at || a.created_at || '',
+                            onclick: t === 'activity' ? "showPage('service','more')" : ''
+                        });
+                    });
+                }
+                // 活动 → 活动通知
+                if (actRes && actRes.code === 0 && actRes.data) {
+                    actRes.data.slice(0, 3).forEach(a => {
+                        msgs.push({
+                            type: 'activity',
+                            icon: '🎉',
+                            bg: 'linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%)',
+                            title: '【活动】' + a.title,
+                            desc: a.location + ' · ' + (a.start_time || ''),
+                            time: a.start_time || '',
+                            onclick: 'showActivityDetail(' + a.id + ')'
+                        });
+                    });
+                }
+                // 报修 → 报修进度
+                if (repairRes && repairRes.code === 0 && repairRes.data) {
+                    repairRes.data.slice(0, 3).forEach(r => {
+                        const statusMap = { pending: '待处理', processing: '处理中', completed: '已完成' };
+                        msgs.push({
+                            type: 'repair',
+                            icon: '🔧',
+                            bg: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
+                            title: '报修：' + r.repair_type,
+                            desc: '状态：' + (statusMap[r.status] || r.status) + ' · ' + (r.description || '').substring(0, 40),
+                            time: r.created_at || '',
+                            onclick: ''
+                        });
+                    });
+                }
+                if (msgs.length === 0) return; // 保留默认静态消息
+                list.innerHTML = msgs.map(m => {
+                    const clickAttr = m.onclick ? ' onclick="' + m.onclick + '"' : '';
+                    return '<div class="msg-item" data-type="' + m.type + '"' + clickAttr + '>' +
+                        '<div class="msg-icon-wrap" style="background: ' + m.bg + ';">' + m.icon + '</div>' +
+                        '<div class="msg-content">' +
+                        '<div class="msg-title">' + m.title + ' <span class="msg-time">' + m.time + '</span></div>' +
+                        '<div class="msg-desc">' + m.desc + '</div>' +
+                        '</div></div>';
+                }).join('');
+                // 重新应用当前选中的tab过滤
+                const activeTab = document.querySelector('.msg-tab.active');
+                if (activeTab) {
+                    const t = activeTab.getAttribute('onclick').match(/switchMsgTab\(this,'(\w+)'\)/);
+                    if (t) document.querySelectorAll('.msg-item').forEach(item => {
+                        item.style.display = (t[1] === 'all' || item.dataset.type === t[1]) ? '' : 'none';
+                    });
+                }
+            } catch(e) { console.error('loadMessages error', e); }
         }
 
 
@@ -1587,6 +1698,8 @@
         setInterval(updateStatusTime, 30000);
 
         // ========== 加载首页数据 ==========
+        var latestActivityId = null;
+
         async function loadHomeData() {
             const online = await checkBackend();
             if (!online) return;
@@ -1596,6 +1709,20 @@
                     updateNotices(res.data.slice(0, 3));
                 }
             } catch(e) { console.error(e); }
+            try {
+                const actRes = await api('api/activities');
+                if (actRes && actRes.code === 0 && actRes.data && actRes.data.length > 0) {
+                    const latest = actRes.data[0];
+                    latestActivityId = latest.id;
+                    const banner = document.getElementById('homeBanner');
+                    if (banner) banner.textContent = '🎉 ' + (latest.title || '社区活动开始报名！');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function clickHomeBanner() {
+            if (latestActivityId) { showActivityDetail(latestActivityId); }
+            else { showPage('service', 'more'); }
         }
 
         function updateNotices(notices) {
@@ -1736,10 +1863,22 @@
             } else if (type === 'visitor') {
                 html = '<div class="form-card">' +
                     '<div class="form-title">👥 访客邀请</div>' +
-                    '<div class="form-row"><label class="form-label">访客姓名</label>' +
+                    '<div class="form-row"><label class="form-label">访客姓名 <span style="color:#ff4d4f">*</span></label>' +
                     '<input type="text" class="form-input" id="vsName" placeholder="请输入访客姓名"></div>' +
+                    '<div class="form-row"><label class="form-label">访客电话</label>' +
+                    '<input type="tel" class="form-input" id="vsPhone" placeholder="请输入访客手机号"></div>' +
                     '<div class="form-row"><label class="form-label">来访时间</label>' +
                     '<input type="datetime-local" class="form-input" id="vsTime"></div>' +
+                    '<div class="form-row"><label class="form-label">来访目的</label>' +
+                    '<select class="form-select" id="vsPurpose"><option value="探亲访友">探亲访友</option><option value="商务拜访">商务拜访</option><option value="快递外卖">快递外卖</option><option value="维修服务">维修服务</option><option value="其他">其他</option></select></div>' +
+                    '<div class="form-row"><label class="form-label">被访楼栋 <span style="color:#ff4d4f">*</span></label>' +
+                    '<input type="text" class="form-input" id="vsBuilding" value="3栋" placeholder="如：3栋"></div>' +
+                    '<div class="form-row"><label class="form-label">被访单元</label>' +
+                    '<input type="text" class="form-input" id="vsUnit" value="2单元" placeholder="如：2单元"></div>' +
+                    '<div class="form-row"><label class="form-label">被访房号</label>' +
+                    '<input type="text" class="form-input" id="vsRoom" value="1501" placeholder="如：1501"></div>' +
+                    '<div class="form-row"><label class="form-label">被访住户 <span style="color:#ff4d4f">*</span></label>' +
+                    '<input type="text" class="form-input" id="vsResident" value="李明华" placeholder="请输入被访住户姓名"></div>' +
                     '<div class="form-row"><label class="form-label">车牌号</label>' +
                     '<input type="text" class="form-input" id="vsPlate" placeholder="粤A12345（选填）"></div>' +
                     '<button class="submit-btn" onclick="submitVisitor()">发送邀请</button>' +
@@ -1772,6 +1911,18 @@
                     '<input type="text" class="form-input" id="htAddress" value="碧水园3栋2单元1501"></div>' +
                     '<button class="submit-btn" onclick="submitHealth()">提交预约</button>' +
                     '</div>';
+            } else if (type === 'parking') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">🅿️ 车位查询</div>' +
+                    '<div id="parkingList" style="margin-top:12px;"><div style="padding:20px;text-align:center;color:#999;">加载中...</div></div>' +
+                    '</div>';
+                setTimeout(loadParkingList, 100);
+            } else if (type === 'more') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">🎉 社区活动</div>' +
+                    '<div id="activityList" style="margin-top:12px;"><div style="padding:20px;text-align:center;color:#999;">加载中...</div></div>' +
+                    '</div>';
+                setTimeout(loadActivityList, 100);
             } else {
                 html = '<div class="form-card"><div class="form-title">🚧 开发中</div><p style="padding:16px;color:#999;">该功能正在开发中，敬请期待！</p></div>';
             }
@@ -1825,15 +1976,136 @@
         async function submitProperty() {
             const online = await checkBackend();
             if (!online) { showH5Toast('后端未连接：查询已提交', 'info'); return; }
-            showH5Toast('缴费页面开发中...', 'info');
+            const feeType = document.getElementById('pfType').value;
+            const feePeriod = document.getElementById('pfMonth').value;
+            if (!feePeriod) { showH5Toast('请选择缴费周期', 'error'); return; }
+            const res = await api('api/property/fees?fee_type=' + encodeURIComponent(feeType));
+            if (!res || res.code !== 0) { showH5Toast('查询失败', 'error'); return; }
+            const list = res.data || [];
+            const filtered = list.filter(f => f.fee_period === feePeriod || !feePeriod);
+            let html = '<div class="form-card"><div class="form-title">💰 ' + feeType + '账单</div>';
+            if (filtered.length === 0) {
+                html += '<div style="padding:20px;text-align:center;color:#999;">该周期暂无账单</div>';
+            } else {
+                filtered.forEach(f => {
+                    const status = f.status === 'paid' ? '已缴纳' : '待缴纳';
+                    const statusColor = f.status === 'paid' ? '#52c41a' : '#ff4d4f';
+                    html += '<div style="border:1px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                        '<span style="font-weight:600;">' + (f.fee_period || '') + '</span>' +
+                        '<span style="color:' + statusColor + ';font-size:13px;">' + status + '</span>' +
+                        '</div>' +
+                        '<div style="font-size:20px;font-weight:700;color:#ff6b6b;margin:8px 0;">¥' + (f.amount || 0) + '</div>' +
+                        '<div style="font-size:12px;color:#999;">截止日期：' + (f.due_date || '无') + '</div>' +
+                        (f.status !== 'paid' ? '<button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#52c41a,#389e0d);" onclick="payPropertyFee(' + f.id + ')">立即缴费</button>' : '') +
+                        '</div>';
+                });
+            }
+            html += '</div>';
+            document.getElementById('serviceContent').innerHTML = html;
+            showH5Toast('查询成功', 'success');
+        }
+
+        async function payPropertyFee(feeId) {
+            const res = await api('api/property/fees/' + feeId + '/pay', { method: 'POST', body: JSON.stringify({payment_method:'在线支付'}) });
+            if (res && res.code === 0) { showH5Toast('缴费成功！', 'success'); submitProperty(); }
+            else { showH5Toast('缴费失败', 'error'); }
+        }
+
+        async function loadParkingList() {
+            const container = document.getElementById('parkingList');
+            if (!container) return;
+            const res = await api('api/parking/spaces');
+            if (!res || res.code !== 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">加载失败</div>'; return; }
+            const spaces = res.data || [];
+            if (spaces.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">暂无车位信息</div>'; return; }
+            container.innerHTML = spaces.map(s => {
+                const status = s.status === 'available' ? '空闲' : '已占用';
+                const color = s.status === 'available' ? '#52c41a' : '#ff4d4f';
+                return '<div style="border:1px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">' +
+                    '<div>' +
+                    '<div style="font-weight:600;">车位 ' + (s.space_no || '-') + '</div>' +
+                    '<div style="font-size:12px;color:#999;margin-top:4px;">' + (s.area || '-') + '㎡ · ' + (s.space_type || '普通') + '</div>' +
+                    '</div>' +
+                    '<span style="background:' + color + '20;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:12px;">' + status + '</span>' +
+                    '</div>';
+            }).join('');
+        }
+
+        async function loadActivityList() {
+            const container = document.getElementById('activityList');
+            if (!container) return;
+            const res = await api('api/activities');
+            if (!res || res.code !== 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">加载失败</div>'; return; }
+            const acts = res.data || [];
+            if (acts.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">暂无活动</div>'; return; }
+            container.innerHTML = acts.map(a => {
+                const isFull = a.current_participants >= a.max_participants;
+                return '<div style="border:1px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;" onclick="showActivityDetail(' + a.id + ')">' +
+                    '<div style="font-weight:600;">' + (a.title || '社区活动') + '</div>' +
+                    '<div style="font-size:12px;color:#666;margin-top:4px;">📍 ' + (a.location || '-') + ' · ' + (a.start_time || '') + '</div>' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">' +
+                    '<span style="font-size:12px;color:#999;">报名：' + (a.current_participants || 0) + '/' + (a.max_participants || 0) + '</span>' +
+                    '<span style="background:' + (isFull ? '#ff4d4f' : '#1890ff') + '20;color:' + (isFull ? '#ff4d4f' : '#1890ff') + ';padding:2px 8px;border-radius:4px;font-size:12px;">' + (isFull ? '已满员' : (a.fee > 0 ? '¥' + a.fee : '免费')) + '</span>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        var currentActivityId = null;
+
+        async function showActivityDetail(activityId) {
+            currentActivityId = activityId;
+            const res = await api('api/activities');
+            if (!res || res.code !== 0) { showH5Toast('加载失败', 'error'); return; }
+            const act = (res.data || []).find(a => a.id === activityId);
+            if (!act) { showH5Toast('活动不存在', 'error'); return; }
+            document.getElementById('adTitle').textContent = act.title || '社区活动';
+            document.getElementById('adType').textContent = (act.activity_type || '社区活动') + ' · ' + (act.location || '-');
+            document.getElementById('adTime').textContent = '⏰ ' + (act.start_time || '-') + ' ~ ' + (act.end_time || '-');
+            document.getElementById('adOrganizer').textContent = '👤 主办方：' + (act.organizer || '-');
+            document.getElementById('adParticipants').textContent = '👥 已报名：' + (act.current_participants || 0) + '/' + (act.max_participants || 0);
+            document.getElementById('adFee').textContent = '💰 费用：' + (act.fee > 0 ? '¥' + act.fee : '免费');
+            document.getElementById('adContent').textContent = act.content || '暂无详情';
+            const btn = document.getElementById('adRegisterBtn');
+            const isFull = act.current_participants >= act.max_participants;
+            if (isFull) { btn.textContent = '已满员'; btn.disabled = true; btn.style.background = '#ccc'; }
+            else { btn.textContent = '立即报名'; btn.disabled = false; btn.style.background = ''; }
+            showPage('activity-detail');
+        }
+
+        async function registerCurrentActivity() {
+            if (!currentActivityId) return;
+            const name = prompt('请输入报名人姓名', '李明华');
+            if (!name) return;
+            const phone = prompt('请输入联系电话', '13812345678');
+            if (!phone) return;
+            const res = await api('api/activities/' + currentActivityId + '/register', {
+                method: 'POST',
+                body: JSON.stringify({resident_name: name, resident_phone: phone, participants: 1})
+            });
+            if (res && res.code === 0) { showH5Toast('报名成功！', 'success'); showActivityDetail(currentActivityId); }
+            else { showH5Toast(res ? res.message : '报名失败', 'error'); }
         }
 
         async function submitVisitor() {
             const online = await checkBackend();
             if (!online) { showH5Toast('后端未连接：邀请已发送', 'info'); return; }
+            const name = document.getElementById('vsName').value.trim();
+            const building = document.getElementById('vsBuilding').value.trim();
+            const resident = document.getElementById('vsResident').value.trim();
+            if (!name) { showH5Toast('请填写访客姓名', 'error'); return; }
+            if (!building) { showH5Toast('请填写被访楼栋', 'error'); return; }
+            if (!resident) { showH5Toast('请填写被访住户', 'error'); return; }
             const data = {
-                visitor_name: document.getElementById('vsName').value,
+                visitor_name: name,
+                visitor_phone: document.getElementById('vsPhone').value,
                 visit_time: document.getElementById('vsTime').value,
+                visit_purpose: document.getElementById('vsPurpose').value,
+                visited_building: building,
+                visited_unit: document.getElementById('vsUnit').value,
+                visited_room: document.getElementById('vsRoom').value,
+                visited_resident: resident,
                 plate_number: document.getElementById('vsPlate').value,
             };
             const res = await api('api/visitor/records', { method: 'POST', body: JSON.stringify(data) });

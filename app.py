@@ -1789,19 +1789,32 @@ def get_visitor_records():
 @app.route('/api/visitor/records', methods=['POST'])
 def create_visitor_record():
     """登记访客"""
-    data = request.json
+    data = request.json or {}
     conn = get_db()
     cursor = conn.cursor()
     now = datetime.now().strftime('%Y-%m-%d %H:%M')
-    
+
+    # 兼容前端字段名（前端传 visit_time/plate_number）
+    visitor_name = data.get('visitor_name', '未知访客')
+    visitor_phone = data.get('visitor_phone', '')
+    visited_building = data.get('visited_building') or data.get('building') or '未知楼栋'
+    visited_unit = data.get('visited_unit') or data.get('unit') or ''
+    visited_room = data.get('visited_room') or data.get('room') or ''
+    visited_resident = data.get('visited_resident') or data.get('resident_name') or data.get('contact_name') or '未知住户'
+    visit_purpose = data.get('visit_purpose') or data.get('purpose') or '访客邀请'
+    entry_time = data.get('entry_time') or data.get('visit_time') or now
+    plate_number = data.get('plate_number', '')
+    remark = data.get('remark', '')
+    if plate_number and not remark:
+        remark = f'车牌号：{plate_number}'
+
     cursor.execute('''
-        INSERT INTO visitor_records 
-        (visitor_name, visitor_phone, visited_building, visited_unit, visited_room, visited_resident, visit_purpose, entry_time, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'inside')
-    ''', (data.get('visitor_name'), data.get('visitor_phone'),
-          data.get('visited_building'), data.get('visited_unit'), data.get('visited_room'),
-          data.get('visited_resident'), data.get('visit_purpose'), now))
-    
+        INSERT INTO visitor_records
+        (visitor_name, visitor_phone, visited_building, visited_unit, visited_room, visited_resident, visit_purpose, entry_time, status, remark)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'inside', ?)
+    ''', (visitor_name, visitor_phone, visited_building, visited_unit, visited_room,
+          visited_resident, visit_purpose, entry_time, remark))
+
     conn.commit()
     record_id = cursor.lastrowid
     conn.close()
