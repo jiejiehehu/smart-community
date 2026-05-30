@@ -1641,13 +1641,23 @@ def create_repair_order():
     count = cursor.fetchone()[0]
     order_no = f"BX{today}{count+1:02d}"
     
+    # 兼容前端字段名（前端传 contact_name/contact_phone/description/book_time）
+    resident_name = data.get('contact_name') or data.get('resident_name', '未知')
+    resident_phone = data.get('contact_phone') or data.get('resident_phone', '')
+    building = data.get('building', '碧水园')
+    unit = data.get('unit', '')
+    room_no = data.get('room_no', '')
+    repair_type = data.get('repair_type', '其他')
+    repair_desc = data.get('description') or data.get('repair_desc', '')
+    urgency = data.get('urgency', 'normal')
+    appointment_time = data.get('book_time') or data.get('appointment_time', '')
+
     cursor.execute('''
-        INSERT INTO repair_orders 
-        (order_no, resident_name, resident_phone, building, unit, room_no, repair_type, repair_desc, urgency)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (order_no, data.get('resident_name'), data.get('resident_phone'),
-          data.get('building'), data.get('unit'), data.get('room_no'),
-          data.get('repair_type'), data.get('repair_desc'), data.get('urgency', 'normal')))
+        INSERT INTO repair_orders
+        (order_no, resident_name, resident_phone, building, unit, room_no, repair_type, repair_desc, urgency, appointment_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (order_no, resident_name, resident_phone, building, unit, room_no,
+          repair_type, repair_desc, urgency, appointment_time))
     
     conn.commit()
     order_id = cursor.lastrowid

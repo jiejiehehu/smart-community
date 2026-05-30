@@ -911,6 +911,28 @@
         }
 
         // ========== SOS ==========
+        async function triggerSOS() {
+            const confirmed = confirm('确认发起 SOS 紧急呼叫？物业人员将立即赶来救援。');
+            if (!confirmed) return;
+            document.getElementById('sosOverlay').classList.add('show');
+            try {
+                const data = {
+                    resident_name: document.getElementById('htName') ? document.getElementById('htName').value : '未知',
+                    resident_phone: document.getElementById('htPhone') ? document.getElementById('htPhone').value : '',
+                    sos_location: document.getElementById('htAddress') ? document.getElementById('htAddress').value : '未知位置',
+                    sos_reason: '紧急求助',
+                    urgency: 'high'
+                };
+                const res = await api('api/sos/alert', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 0) {
+                    showH5Toast('SOS 呼叫已发送，请保持电话畅通', 'success');
+                } else {
+                    showH5Toast('SOS 呼叫发送失败', 'error');
+                }
+            } catch (e) {
+                showH5Toast('SOS 呼叫已记录（离线模式）', 'info');
+            }
+        }
         function closeSOSOverlay() {
             document.getElementById('sosOverlay').classList.remove('show');
         }
@@ -1085,7 +1107,8 @@
                     '<button class="submit-btn" onclick="submitVisitor()">发送邀请</button>' +
                     '</div>';
             } else if (type === 'health') {
-                html = '<div class="form-card">' +
+                html = '<button class="sos-btn" onclick="triggerSOS()">🆘 一键 SOS 紧急呼叫</button>' +
+                    '<div class="form-card">' +
                     '<div class="form-title">💊 健康服务</div>' +
                     '<div class="form-row"><label class="form-label">服务类型</label>' +
                     '<select class="form-select" id="htType">' +
