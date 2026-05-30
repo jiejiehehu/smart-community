@@ -2098,6 +2098,9 @@
         function closeGuide() {
             document.getElementById('guideModal').style.display = 'none';
             localStorage.setItem('smartCommunityGuideShown', 'true');
+            // 自动切换到数据看板，给用户明确的引导
+            switchModule('dashboard');
+            showPage('dashboard-home');
         }
         function toggleHelpPanel() {
             const panel = document.getElementById('helpPanel');
