@@ -83,6 +83,26 @@ def init_db():
     ''')
     
     cursor.execute('''
+        CREATE TABLE IF NOT EXISTS health_orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_no TEXT UNIQUE NOT NULL,
+            service_type TEXT NOT NULL,
+            service_type_name TEXT NOT NULL,
+            book_date TEXT NOT NULL,
+            book_time TEXT NOT NULL,
+            contact_name TEXT NOT NULL,
+            contact_phone TEXT NOT NULL,
+            address TEXT NOT NULL,
+            remark TEXT,
+            status TEXT DEFAULT 'pending',
+            staff_id INTEGER,
+            staff_name TEXT,
+            completed_at TEXT,
+            rating INTEGER,
+            review TEXT
+        )
+        ''')
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS canteen_orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_no TEXT UNIQUE NOT NULL,
@@ -2491,6 +2511,113 @@ def reply_community_consultation(consult_id):
     conn.commit()
     conn.close()
     return jsonify({'code': 0, 'message': '回复成功'})
+
+
+# 此文件内容将被插入到 app.py 的 if __name__ == '__main__': 之前
+
+# ===== 健康服务订单 API =====
+
+@app.route('/api/health/orders', methods=['GET'])
+def get_health_orders():
+    """获取健康服务订单列表"""
+    conn = get_db()
+    cursor = conn.cursor()
+    status = request.args.get('status', '')
+    if status:
+        cursor.execute('SELECT * FROM health_orders WHERE status = ? ORDER BY created_at DESC', (status,))
+    else:
+        cursor.execute('SELECT * FROM health_orders ORDER BY created_at DESC')
+    orders = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'code': 0, 'data': orders})
+
+
+@app.route('/api/health/orders', methods=['POST'])
+def create_health_order():
+    """创建健康服务订单"""
+    data = request.json
+    today = datetime.now()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM health_orders WHERE order_no LIKE ?", (f"JK{today.strftime('%Y%m%d')}%",))
+    cnt = cursor.fetchone()[0]
+    order_no = f"JK{today.strftime('%Y%m%d')}{cnt+1:02d}"
+    service_names = {'体检': '常规体检', '按摩': '穴位按摩', '理疗': '物理治疗', '健康咨询': '营养师咨询'}
+    cursor.execute('''
+        INSERT INTO health_orders
+            (order_no, service_type, service_type_name, book_date, book_time,
+             contact_name, contact_phone, address, remark, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        order_no,
+        data.get('service_type', ''),
+        service_names.get(data.get('service_type', ''), '健康服务'),
+        data.get('book_date', ''),
+        data.get('book_time', ''),
+        data.get('contact_name', ''),
+        data.get('contact_phone', ''),
+        data.get('address', ''),
+        data.get('remark', ''),
+        'pending'
+    ))
+    conn.commit()
+    oid = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '预约成功', 'data': {'id': oid}})
+
+
+@app.route('/api/health/orders/<int:order_id>/accept', methods=['PUT'])
+def accept_health_order(order_id):
+    """接单"""
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE health_orders SET status=?, staff_id=?, staff_name=? WHERE id=?',
+                   ('accepted', data.get('staff_id'), data.get('staff_name'), order_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '接单成功'}) if success else jsonify({'code': 1, 'message': '接单失败'})
+
+
+@app.route('/api/health/orders/<int:order_id>/process', methods=['PUT'])
+def process_health_order(order_id):
+    """开始服务"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE health_orders SET status='processing' WHERE id=?", (order_id,))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '服务已开始'}) if success else jsonify({'code': 1, 'message': '操作失败'})
+
+
+@app.route('/api/health/orders/<int:order_id>/complete', methods=['PUT'])
+def complete_health_order(order_id):
+    """完成服务"""
+    now = datetime.now().strftime('%Y-%m-%d %H:%M')
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE health_orders SET status='pending_review', completed_at=? WHERE id=?", (now, order_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '服务已完成，等待评价'}) if success else jsonify({'code': 1, 'message': '操作失败'})
+
+
+@app.route('/api/health/orders/<int:order_id>/review', methods=['POST'])
+def review_health_order(order_id):
+    """评价订单"""
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE health_orders SET status=?, rating=?, review=? WHERE id=?',
+                   ('completed', data.get('rating'), data.get('review', ''), order_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '评价成功'}) if success else jsonify({'code': 1, 'message': '评价失败'})
+
 
 if __name__ == '__main__':
     import os
