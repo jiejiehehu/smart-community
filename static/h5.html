@@ -1046,7 +1046,7 @@
                 contact_phone: document.getElementById('htPhone').value,
                 address: document.getElementById('htAddress').value,
             };
-            const res = await api('api/health/orders', { method: 'POST', body: JSON.stringify(data) });
+            const res = await api('api/health/records', { method: 'POST', body: JSON.stringify(data) });
             if (res && res.code === 0) { showH5Toast('健康服务预约成功！', 'success'); }
             else { showH5Toast('预约失败，请重试', 'error'); }
         }
