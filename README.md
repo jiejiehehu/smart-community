@@ -5,8 +5,13 @@
 ## 快速启动
 
 ```bash
-cd 家政服务
+# 安装依赖
+pip install flask flask-cors
+
+# 启动服务
 bash start.sh
+# 或直接运行
+python3 app.py
 ```
 
 然后在浏览器访问：
@@ -154,14 +159,20 @@ bash start.sh
 ## 文件结构
 
 ```
-家政服务/
-├── app.py              # Flask后端（11个功能模块API）
-├── static/
-│   ├── index.html      # PC管理端页面（含11个模块）
-│   └── h5.html         # H5居民端页面
-├── start.sh            # 启动脚本
-├── README.md           # 本文档
-└── data/               # SQLite数据库文件（运行时生成）
+智慧社区物业管理平台/
+├── app.py                  # Flask后端（11个功能模块API）
+├── start.sh                # 启动脚本
+├── requirements.txt        # Python依赖
+├── render.yaml             # 部署配置
+├── README.md               # 本文档
+├── API对接完成说明.md       # API对接说明
+├── static/                 # 前端静态文件
+│   ├── index.html          # PC管理端页面
+│   ├── h5.html             # H5居民端页面
+│   ├── design-system.css   # 设计系统样式
+│   ├── commdoctor.js       # 社区医生模块
+│   └── mock*.js/json       # 模拟数据
+└── data/                   # SQLite数据库（运行时生成）
 ```
 
 ## API 接口
@@ -169,13 +180,19 @@ bash start.sh
 - `/api/stats` - 全局统计
 - `/api/housekeeping/*` - 家政服务
 - `/api/canteen/*` - 食堂管理
+- `/api/canteen/menus` - 每日菜谱
+- `/api/canteen/gallery` - 食堂风采
 - `/api/property/*` - 物业缴费
 - `/api/repair/*` - 报修管理
 - `/api/visitor/*` - 访客管理
 - `/api/announcements` - 公告通知
 - `/api/parking/*` - 车位管理
-- `/api/health/*` - 健康监测
+- `/api/health/*` - 健康监测/服务
+- `/api/health-profile` - 健康档案
 - `/api/care/*` - 照护计划
 - `/api/sos/*` - 紧急呼叫
 - `/api/activities` - 社区活动
 - `/api/security/*` - 安防监控
+- `/api/community/*` - 社区医生
+- `/api/family-members` - 家庭成员
+- `/api/shipping-addresses` - 收货地址
