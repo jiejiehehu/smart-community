@@ -28,3 +28,6 @@ Thumbs.db
 
 # 数据库文件
 data/*.db
+.workbuddy/
+health-records-ui/
+.workbuddy/MEMORY.md

@@ -1303,29 +1303,36 @@
             list.insertAdjacentHTML('beforeend', html);
         }
         function showAddHealthForm() {
-            const html = `<div class="form-overlay" id="healthFormOverlay">
-                <div class="form-modal">
-                    <div class="form-title">新建健康档案</div>
-                    <div class="form-body">
-                        <div class="form-group"><label>姓名</label><input id="hpName" placeholder="请输入姓名"></div>
-                        <div class="form-group"><label>性别</label><select id="hpGender"><option value="">请选择</option><option>男</option><option>女</option></select></div>
-                        <div class="form-group"><label>出生日期</label><input id="hpBirth" type="date"></div>
-                        <div class="form-group"><label>身高(cm)</label><input id="hpHeight" type="number" placeholder="请输入身高" oninput="calcBMI()"></div>
-                        <div class="form-group"><label>体重(kg)</label><input id="hpWeight" type="number" placeholder="请输入体重" oninput="calcBMI()"></div>
-                        <div class="form-group"><label>血型</label><select id="hpBloodType"><option value="">请选择</option><option>A型</option><option>B型</option><option>O型</option><option>AB型</option></select></div>
-                        <div class="form-group"><label>过敏史</label><input id="hpAllergies" placeholder="如：青霉素过敏"></div>
-                        <div class="form-group"><label>慢性病</label><input id="hpChronic" placeholder="如：高血压、糖尿病"></div>
-                        <div class="form-group"><label>用药情况</label><input id="hpMeds" placeholder="如：阿司匹林 每日1次"></div>
-                        <div class="form-group"><label>最近体检日期</label><input id="hpExamDate" type="date"></div>
-                        <div class="form-group"><label>体检摘要</label><textarea id="hpExamSummary" placeholder="请输入体检摘要"></textarea></div>
-                    </div>
-                    <div class="form-footer">
-                        <button class="btn-cancel" onclick="closeHealthForm()">取消</button>
-                        <button class="btn-submit" onclick="submitHealthProfile()">保存</button>
-                    </div>
-                </div>
-            </div>`;
-            document.body.insertAdjacentHTML('beforeend', html);
+            console.log('showAddHealthForm() called!');
+            try {
+            let overlay = document.getElementById('healthFormOverlay');
+            if (overlay) overlay.remove();
+            overlay = document.createElement('div');
+            overlay.className = 'form-overlay';
+            overlay.id = 'healthFormOverlay';
+            overlay.innerHTML = '<div class="form-modal">' +
+                '<div class="form-title">新建健康档案</div>' +
+                '<div class="form-body">' +
+                    '<div class="form-group"><label>姓名</label><input id="hpName" placeholder="请输入姓名"></div>' +
+                    '<div class="form-group"><label>性别</label><select id="hpGender"><option value="">请选择</option><option>男</option><option>女</option></select></div>' +
+                    '<div class="form-group"><label>出生日期</label><input id="hpBirth" type="date"></div>' +
+                    '<div class="form-group"><label>身高(cm)</label><input id="hpHeight" type="number" placeholder="请输入身高" oninput="calcBMI()"></div>' +
+                    '<div class="form-group"><label>体重(kg)</label><input id="hpWeight" type="number" placeholder="请输入体重" oninput="calcBMI()"></div>' +
+                    '<div class="form-group"><label>血型</label><select id="hpBloodType"><option value="">请选择</option><option>A型</option><option>B型</option><option>O型</option><option>AB型</option></select></div>' +
+                    '<div class="form-group"><label>过敏史</label><input id="hpAllergies" placeholder="如：青霉素过敏"></div>' +
+                    '<div class="form-group"><label>慢性病</label><input id="hpChronic" placeholder="如：高血压、糖尿病"></div>' +
+                    '<div class="form-group"><label>用药情况</label><input id="hpMeds" placeholder="如：阿司匹林 每日1次"></div>' +
+                    '<div class="form-group"><label>最近体检日期</label><input id="hpExamDate" type="date"></div>' +
+                    '<div class="form-group"><label>体检摘要</label><textarea id="hpExamSummary" placeholder="请输入体检摘要"></textarea></div>' +
+                '</div>' +
+                '<div class="form-footer">' +
+                    '<button class="btn-cancel" onclick="closeHealthForm()">取消</button>' +
+                    '<button class="btn-submit" onclick="submitHealthProfile()">保存</button>' +
+                '</div>' +
+            '</div>';
+            document.body.appendChild(overlay);
+            console.log('Form overlay appended to body!');
+            } catch(e) { console.error('Error in showAddHealthForm:', e); }
         }
         function closeHealthForm() {
             const el = document.getElementById('healthFormOverlay');
