@@ -118,6 +118,32 @@ def init_db():
         remark TEXT
     )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS canteen_menus (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            menu_date TEXT NOT NULL,
+            meal_type TEXT NOT NULL,
+            dishes TEXT NOT NULL,
+            price REAL DEFAULT 0,
+            calories TEXT,
+            status TEXT DEFAULT 'available',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS canteen_gallery (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            desc TEXT,
+            icon TEXT,
+            bg TEXT,
+            sort INTEGER DEFAULT 10,
+            status TEXT DEFAULT 'active',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS ingredients (
@@ -1568,6 +1594,125 @@ def get_ingredients():
     ingredients = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return jsonify({'code': 0, 'data': ingredients})
+
+@app.route('/api/canteen/menus', methods=['GET'])
+def get_canteen_menus():
+    """获取每日菜谱"""
+    conn = get_db()
+    cursor = conn.cursor()
+    menu_date = request.args.get('date', '')
+    meal_type = request.args.get('meal_type', '')
+    query = 'SELECT * FROM canteen_menus WHERE 1=1'
+    params = []
+    if menu_date:
+        query += ' AND menu_date = ?'
+        params.append(menu_date)
+    if meal_type:
+        query += ' AND meal_type = ?'
+        params.append(meal_type)
+    query += ' ORDER BY menu_date DESC, meal_type'
+    cursor.execute(query, params)
+    menus = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'code': 0, 'data': menus})
+
+@app.route('/api/canteen/menus', methods=['POST'])
+def create_canteen_menu():
+    """添加每日菜谱"""
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO canteen_menus (menu_date, meal_type, dishes, price, calories, status)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (data.get('menu_date'), data.get('meal_type'), data.get('dishes'),
+          data.get('price', 0), data.get('calories', ''), data.get('status', 'available')))
+    conn.commit()
+    menu_id = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '菜谱添加成功', 'data': {'id': menu_id}})
+
+@app.route('/api/canteen/menus/<int:menu_id>', methods=['PUT'])
+def update_canteen_menu(menu_id):
+    """更新每日菜谱"""
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE canteen_menus
+        SET menu_date = ?, meal_type = ?, dishes = ?, price = ?, calories = ?, status = ?
+        WHERE id = ?
+    ''', (data.get('menu_date'), data.get('meal_type'), data.get('dishes'),
+          data.get('price', 0), data.get('calories', ''), data.get('status', 'available'), menu_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '菜谱更新成功'}) if success else jsonify({'code': 1, 'message': '更新失败'})
+
+@app.route('/api/canteen/menus/<int:menu_id>', methods=['DELETE'])
+def delete_canteen_menu(menu_id):
+    """删除每日菜谱"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM canteen_menus WHERE id = ?', (menu_id,))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '菜谱删除成功'}) if success else jsonify({'code': 1, 'message': '删除失败'})
+
+@app.route('/api/canteen/gallery', methods=['GET'])
+def get_canteen_gallery():
+    """获取食堂风采列表"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM canteen_gallery ORDER BY sort ASC, id DESC')
+    gallery = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'code': 0, 'data': gallery})
+
+@app.route('/api/canteen/gallery', methods=['POST'])
+def create_canteen_gallery():
+    """添加食堂风采"""
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO canteen_gallery (title, desc, icon, bg, sort, status)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (data.get('title'), data.get('desc', ''), data.get('icon', '🍽️'),
+          data.get('bg', '#FFF7E6'), data.get('sort', 10), data.get('status', 'active')))
+    conn.commit()
+    gallery_id = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '风采添加成功', 'data': {'id': gallery_id}})
+
+@app.route('/api/canteen/gallery/<int:gallery_id>', methods=['PUT'])
+def update_canteen_gallery(gallery_id):
+    """更新食堂风采"""
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE canteen_gallery
+        SET title = ?, desc = ?, icon = ?, bg = ?, sort = ?, status = ?
+        WHERE id = ?
+    ''', (data.get('title'), data.get('desc', ''), data.get('icon', '🍽️'),
+          data.get('bg', '#FFF7E6'), data.get('sort', 10), data.get('status', 'active'), gallery_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '风采更新成功'}) if success else jsonify({'code': 1, 'message': '更新失败'})
+
+@app.route('/api/canteen/gallery/<int:gallery_id>', methods=['DELETE'])
+def delete_canteen_gallery(gallery_id):
+    """删除食堂风采"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM canteen_gallery WHERE id = ?', (gallery_id,))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '风采删除成功'}) if success else jsonify({'code': 1, 'message': '删除失败'})
 
 # ============ 物业缴费API ============
 
