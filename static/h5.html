@@ -316,6 +316,65 @@
             box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
         }
         .form-textarea { min-height: 80px; resize: vertical; }
+
+        /* --- 食堂菜谱样式 --- */
+        .canteen-tabs {
+            display: flex; background: var(--color-bg-light); border-radius: var(--radius-lg);
+            padding: 4px; margin-bottom: 12px;
+        }
+        .canteen-tab {
+            flex: 1; padding: 12px; text-align: center; border-radius: var(--radius-md);
+            font-size: 14px; font-weight: 500; color: var(--color-text-secondary);
+            cursor: pointer; transition: all 0.15s;
+        }
+        .canteen-tab.active {
+            background: var(--color-white); color: var(--color-primary);
+            box-shadow: var(--shadow-xs);
+        }
+        .week-selector {
+            display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .week-day {
+            flex-shrink: 0; width: 52px; text-align: center; padding: 8px 4px;
+            border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s;
+            background: var(--color-bg-light);
+        }
+        .week-day.active {
+            background: var(--color-primary); color: white;
+        }
+        .week-day .day-name { font-size: 11px; margin-bottom: 4px; display: block; }
+        .week-day .day-date { font-size: 14px; font-weight: 600; display: block; }
+        .week-day.today { border: 2px solid var(--color-primary); }
+        .meal-tabs {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .meal-tab {
+            padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+            cursor: pointer; transition: all 0.15s; background: var(--color-bg-light);
+            color: var(--color-text-secondary);
+        }
+        .meal-tab.active {
+            background: var(--color-primary); color: white;
+        }
+        .menu-list { }
+        .menu-item {
+            display: flex; align-items: center; padding: 12px;
+            border-bottom: 1px solid var(--color-border-light);
+            cursor: pointer; transition: background 0.15s;
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: var(--color-bg-light); }
+        .menu-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; margin-right: 12px; flex-shrink: 0;
+        }
+        .menu-info { flex: 1; min-width: 0; }
+        .menu-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+        .menu-desc { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+        .menu-price { font-size: 15px; font-weight: 600; color: var(--color-danger); }
+
         .submit-btn {
             width: 100%; padding: 14px; background: var(--color-primary-gradient);
             color: white; border: none; border-radius: 25px; font-size: 16px;
@@ -1822,8 +1881,12 @@
                     '<button class="submit-btn" onclick="submitHousekeeping()">提交预约</button>' +
                     '</div>';
             } else if (type === 'canteen') {
-                html = '<div class="form-card">' +
-                    '<div class="form-title">🍽️ 社区食堂</div>' +
+                html = '<div class="canteen-tabs">' +
+                    '<div class="canteen-tab active" onclick="switchCanteenTab(this,\'order\')">🍽️ 订餐</div>' +
+                    '<div class="canteen-tab" onclick="switchCanteenTab(this,\'menu\')">📋 本周菜谱</div>' +
+                    '</div>' +
+                    '<div class="form-card" id="canteenOrderForm">' +
+                    '<div class="form-title">社区食堂订餐</div>' +
                     '<div class="form-row"><label class="form-label">用餐类型</label>' +
                     '<select class="form-select" id="ctType">' +
                     '<option value="堂食">堂食</option>' +
@@ -1834,6 +1897,14 @@
                     '<div class="form-row"><label class="form-label">人数</label>' +
                     '<input type="number" class="form-input" id="ctPeople" value="1" min="1"></div>' +
                     '<button class="submit-btn" onclick="submitCanteen()">提交订单</button>' +
+                    '</div>' +
+                    '<div id="canteenMenuView" style="display:none;">' +
+                    '<div class="form-card">' +
+                    '<div class="form-title">📋 本周菜谱</div>' +
+                    '<div class="week-selector" id="weekSelector"></div>' +
+                    '<div class="meal-tabs" id="mealTabs"></div>' +
+                    '<div class="menu-list" id="menuList"></div>' +
+                    '</div>' +
                     '</div>';
             } else if (type === 'repair') {
                 html = '<div class="form-card">' +
@@ -1964,6 +2035,111 @@
             const res = await api('api/canteen/orders', { method: 'POST', body: JSON.stringify(data) });
             if (res && res.code === 0) { showH5Toast('订单提交成功！', 'success'); }
             else { showH5Toast('提交失败，请重试', 'error'); }
+        }
+
+        // ========== 食堂菜谱功能 ==========
+        var currentMenuDate = '';
+        var currentMealType = '';
+
+        function switchCanteenTab(el, tab) {
+            document.querySelectorAll('.canteen-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            if (tab === 'order') {
+                document.getElementById('canteenOrderForm').style.display = '';
+                document.getElementById('canteenMenuView').style.display = 'none';
+            } else {
+                document.getElementById('canteenOrderForm').style.display = 'none';
+                document.getElementById('canteenMenuView').style.display = '';
+                loadWeekSelector();
+                loadMealTabs();
+            }
+        }
+
+        function loadWeekSelector() {
+            const selector = document.getElementById('weekSelector');
+            if (!selector) return;
+            const today = new Date();
+            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekDays = [];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                weekDays.push({
+                    date: date.toISOString().split('T')[0],
+                    dayName: dayNames[date.getDay()],
+                    dayDate: date.getDate(),
+                    isToday: i === 0
+                });
+            }
+            selector.innerHTML = weekDays.map(d => `
+                <div class="week-day ${d.isToday ? 'today' : ''} ${currentMenuDate === d.date ? 'active' : ''}" 
+                     onclick="selectMenuDate('${d.date}')">
+                    <span class="day-name">周${d.dayName}</span>
+                    <span class="day-date">${d.dayDate}</span>
+                </div>
+            `).join('');
+            if (!currentMenuDate) {
+                currentMenuDate = weekDays[0].date;
+                loadMenuList();
+            }
+        }
+
+        function loadMealTabs() {
+            const tabs = document.getElementById('mealTabs');
+            if (!tabs) return;
+            const mealTypes = [
+                { type: '', label: '全部' },
+                { type: 'breakfast', label: '早餐' },
+                { type: 'lunch', label: '午餐' },
+                { type: 'dinner', label: '晚餐' }
+            ];
+            tabs.innerHTML = mealTypes.map(m => `
+                <div class="meal-tab ${currentMealType === m.type ? 'active' : ''}"
+                     onclick="selectMealType('${m.type}')">${m.label}</div>
+            `).join('');
+        }
+
+        function selectMenuDate(date) {
+            document.querySelectorAll('.week-day').forEach(d => d.classList.remove('active'));
+            event.target.closest('.week-day').classList.add('active');
+            currentMenuDate = date;
+            loadMenuList();
+        }
+
+        function selectMealType(type) {
+            document.querySelectorAll('.meal-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            currentMealType = type;
+            loadMenuList();
+        }
+
+        async function loadMenuList() {
+            const list = document.getElementById('menuList');
+            if (!list) return;
+            list.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">加载中...</div>';
+            try {
+                let url = 'api/canteen/menus?date=' + encodeURIComponent(currentMenuDate);
+                if (currentMealType) {
+                    url += '&meal_type=' + encodeURIComponent(currentMealType);
+                }
+                const res = await api(url);
+                if (res && res.code === 0 && res.data && res.data.length > 0) {
+                    list.innerHTML = res.data.map(item => `
+                        <div class="menu-item">
+                            <div class="menu-icon" style="background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);">🍽️</div>
+                            <div class="menu-info">
+                                <div class="menu-name">${item.dishes}</div>
+                                <div class="menu-desc">${item.calories || ''}</div>
+                            </div>
+                            <div class="menu-price">¥${item.price || 0}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">暂无菜谱</div>';
+                }
+            } catch (e) {
+                list.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">加载失败</div>';
+            }
         }
 
         async function submitRepair() {
