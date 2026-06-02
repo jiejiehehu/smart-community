@@ -1100,152 +1100,203 @@
                 </div>
             </div>
             
-            <!-- ========== 社区大屏展示 ========== -->
-            <div id="page-dashboard-screen" class="page-content">
-                <div style="background: linear-gradient(135deg, #0a1628 0%, #1a3a5a 50%, #0d4a3a 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
-                        <div style="width: 4px; height: 24px; background: linear-gradient(180deg, #00d4ff 0%, #13c2c2 100%); border-radius: 2px;"></div>
-                        <h1 style="color: white; font-size: 24px; font-weight: 700; letter-spacing: 2px;">东湖社区基本信息可视化</h1>
-                        <div style="width: 4px; height: 24px; background: linear-gradient(180deg, #00d4ff 0%, #13c2c2 100%); border-radius: 2px;"></div>
-                    </div>
-                    <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 13px;">武汉洪山区梨园街道东湖社区 · 智慧社区管理平台</div>
-                </div>
-
-                <div style="background: linear-gradient(135deg, #e6f7ff 0%, #f0f7ff 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                        <span style="font-size: 18px;">🏘️</span>
-                        <h2 style="font-size: 16px; font-weight: 600; color: #333;">社区基础信息</h2>
-                    </div>
-                    <p style="color: #666; font-size: 14px; line-height: 1.8; text-indent: 2em; margin-bottom: 12px;">
-                        东湖社区隶属于武汉市洪山区梨园街道，2009年9月正式成立，党群服务中心位于欢乐大道46号岳家嘴小区3栋1楼。社区地处欢乐大道与中北路交汇处，紧邻东湖风景区、徐东商圈，毗邻地铁4号线、8号线岳家嘴站，交通便利。
-                    </p>
-                    <p style="color: #666; font-size: 14px; line-height: 1.8; text-indent: 2em;">
-                        社区总面积约0.23平方公里，划分16个网格，辖岳家嘴职工小区、东湖花园、东湖睿园等8个住宅小区，共计57栋楼栋，现有居民4800余户、常住人口约15000人，属于商品房、单位宿舍、还建房并存的混合型社区。
-                    </p>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px dashed #b3d9ff;">
-                        <div style="background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                            <div style="width: 48px; height: 48px; margin: 0 auto 10px; background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">🗺️</div>
-                            <div style="font-size: 12px; color: #999; margin-bottom: 4px;">辖区面积</div>
-                            <div style="font-size: 20px; font-weight: 700; color: #1890ff;">0.23平方公里</div>
+            <!-- ========== 社区大屏展示 - 科技版 ========== -->
+            <div id="page-dashboard-screen" class="page-content" style="background: linear-gradient(135deg, #0a0e17 0%, #0d1526 50%, #0a1628 100%); min-height: calc(100vh - 100px); padding: 20px; margin: -20px -20px -20px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none;"></div>
+                <div style="position: absolute; top: 20%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%); border-radius: 50%; animation: pulse 4s ease-in-out infinite;"></div>
+                <div style="position: absolute; bottom: 20%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%); border-radius: 50%; animation: pulse 5s ease-in-out infinite 1s;"></div>
+                
+                <div style="position: relative; z-index: 1;">
+                    <div style="background: linear-gradient(135deg, rgba(10,22,42,0.9) 0%, rgba(26,58,90,0.8) 50%, rgba(13,74,61,0.8) 100%); border-radius: 20px; padding: 30px; margin-bottom: 24px; box-shadow: 0 0 40px rgba(0,212,255,0.2), inset 0 0 60px rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2);">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px;">
+                            <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
+                            <h1 style="color: #00d4ff; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0,212,255,0.5); font-family: 'Microsoft YaHei', sans-serif;">智慧东湖社区</h1>
+                            <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
                         </div>
-                        <div style="background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                            <div style="width: 48px; height: 48px; margin: 0 auto 10px; background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">🏢</div>
-                            <div style="font-size: 12px; color: #999; margin-bottom: 4px;">居民楼房</div>
-                            <div style="font-size: 20px; font-weight: 700; color: #52c41a;">57栋</div>
-                        </div>
-                        <div style="background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                            <div style="width: 48px; height: 48px; margin: 0 auto 10px; background: linear-gradient(135deg, #fa8c16 0%, #d48806 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">🏠</div>
-                            <div style="font-size: 12px; color: #999; margin-bottom: 4px;">住宅小区</div>
-                            <div style="font-size: 20px; font-weight: 700; color: #fa8c16;">8个</div>
-                        </div>
-                        <div style="background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                            <div style="width: 48px; height: 48px; margin: 0 auto 10px; background: linear-gradient(135deg, #722ed1 0%, #531dab 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">📊</div>
-                            <div style="font-size: 12px; color: #999; margin-bottom: 4px;">社区网格</div>
-                            <div style="font-size: 20px; font-weight: 700; color: #722ed1;">16个</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #1890ff;">
-                            <span style="font-size: 18px;">👥</span>
-                            <h3 style="font-size: 15px; font-weight: 600; color: #333;">社区人口结构</h3>
-                        </div>
-                        <div style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                            <div style="position: relative; width: 140px; height: 140px;">
-                                <svg viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e6f7ff" stroke-width="8"/>
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#1890ff" stroke-width="8" stroke-dasharray="238 283" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#52c41a" stroke-width="8" stroke-dasharray="45 283" stroke-dashoffset="-238" transform="rotate(-90 50 50)"/>
-                                </svg>
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                                    <div style="font-size: 20px; font-weight: 700; color: #333;">15000</div>
-                                    <div style="font-size: 11px; color: #999;">常住人口</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: center; gap: 24px; margin-top: 12px;">
+                        <div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 14px;">武汉洪山区梨园街道东湖社区 · 智慧社区管理平台</div>
+                        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px;">
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #1890ff;"></div>
-                                <span style="font-size: 12px; color: #666;">常住人口 13500人</span>
+                                <span style="width: 8px; height: 8px; background: #52c41a; border-radius: 50%; box-shadow: 0 0 10px #52c41a; animation: blink 2s ease-in-out infinite;"></span>
+                                <span style="color: rgba(255,255,255,0.6); font-size: 12px;">系统运行正常</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #52c41a;"></div>
-                                <span style="font-size: 12px; color: #666;">流动人口 1500人</span>
+                            <div style="color: rgba(255,255,255,0.6); font-size: 12px;" id="screen-time">2026-06-01 10:00:00</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid rgba(0,212,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 4px; height: 20px; background: linear-gradient(180deg, #00d4ff 0%, #13c2c2 100%); border-radius: 2px;"></div>
+                            <h2 style="color: #00d4ff; font-size: 18px; font-weight: 600;">🏘️ 社区基础信息</h2>
+                        </div>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.8; text-indent: 2em; margin-bottom: 12px;">
+                            东湖社区隶属于武汉市洪山区梨园街道，2009年9月正式成立，党群服务中心位于欢乐大道46号岳家嘴小区3栋1楼。社区地处欢乐大道与中北路交汇处，紧邻东湖风景区、徐东商圈，毗邻地铁4号线、8号线岳家嘴站，交通便利。
+                        </p>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.8; text-indent: 2em;">
+                            社区总面积约0.23平方公里，划分16个网格，辖岳家嘴职工小区、东湖花园、东湖睿园等8个住宅小区，共计57栋楼栋，现有居民4800余户、常住人口约15000人，属于商品房、单位宿舍、还建房并存的混合型社区。
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; padding-top: 20px; border-top: 1px dashed rgba(0,212,255,0.2);">
+                            <div style="background: rgba(0,212,255,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(0,212,255,0.15); transition: all 0.3s; cursor: pointer;">
+                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(0,212,255,0.2);">🗺️</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">辖区面积</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.5);">0.23<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">平方公里</span></div>
+                            </div>
+                            <div style="background: rgba(82,196,26,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(82,196,26,0.15); transition: all 0.3s; cursor: pointer;">
+                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(82,196,26,0.3) 0%, rgba(56,158,13,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(82,196,26,0.2);">🏢</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">居民楼房</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #52c41a; text-shadow: 0 0 10px rgba(82,196,26,0.5);">57<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">栋</span></div>
+                            </div>
+                            <div style="background: rgba(250,140,22,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(250,140,22,0.15); transition: all 0.3s; cursor: pointer;">
+                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(250,140,22,0.3) 0%, rgba(212,136,6,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(250,140,22,0.2);">🏠</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">住宅小区</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #fa8c16; text-shadow: 0 0 10px rgba(250,140,22,0.5);">8<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">个</span></div>
+                            </div>
+                            <div style="background: rgba(139,92,246,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(139,92,246,0.15); transition: all 0.3s; cursor: pointer;">
+                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(83,29,171,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(139,92,246,0.2);">📊</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">社区网格</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #8b5cf6; text-shadow: 0 0 10px rgba(139,92,246,0.5);">16<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">个</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #52c41a;">
-                            <span style="font-size: 18px;">🏫</span>
-                            <h3 style="font-size: 15px; font-weight: 600; color: #333;">社区配套服务</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; border: 1px solid rgba(0,212,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid rgba(0,212,255,0.3);">
+                                <span style="font-size: 20px;">👥</span>
+                                <h3 style="font-size: 16px; font-weight: 600; color: #00d4ff;">社区人口结构</h3>
+                            </div>
+                            <div style="height: 220px; display: flex; align-items: center; justify-content: center;">
+                                <div style="position: relative; width: 150px; height: 150px;">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="12"/>
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient1)" stroke-width="12" stroke-dasharray="238 283" stroke-dashoffset="0" transform="rotate(-90 50 50)" stroke-linecap="round"/>
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient2)" stroke-width="12" stroke-dasharray="45 283" stroke-dashoffset="-238" transform="rotate(-90 50 50)" stroke-linecap="round"/>
+                                        <defs>
+                                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="#00d4ff"/>
+                                                <stop offset="100%" stop-color="#13c2c2"/>
+                                            </linearGradient>
+                                            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="#52c41a"/>
+                                                <stop offset="100%" stop-color="#389e0d"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.5);">15000</div>
+                                        <div style="font-size: 12px; color: rgba(255,255,255,0.5);">常住人口</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff 0%, #13c2c2 100%); box-shadow: 0 0 10px rgba(0,212,255,0.5);"></div>
+                                    <span style="font-size: 12px; color: rgba(255,255,255,0.7);">常住人口 13500人</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); box-shadow: 0 0 10px rgba(82,196,26,0.5);"></div>
+                                    <span style="font-size: 12px; color: rgba(255,255,255,0.7);">流动人口 1500人</span>
+                                </div>
+                            </div>
                         </div>
-                        <div style="height: 200px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px;">
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                <div style="width: 40px; background: linear-gradient(180deg, #1890ff 0%, #096dd9 100%); border-radius: 6px 6px 0 0; text-align: center; color: white; font-size: 11px; padding-top: 4px; height: 80px; display: flex; align-items: flex-start; justify-content: center;">80%</div>
-                                <span style="font-size: 11px; color: #666;">教育设施</span>
+
+                        <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; border: 1px solid rgba(82,196,26,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid rgba(82,196,26,0.3);">
+                                <span style="font-size: 20px;">🏫</span>
+                                <h3 style="font-size: 16px; font-weight: 600; color: #52c41a;">社区配套服务</h3>
                             </div>
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                <div style="width: 40px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%); border-radius: 6px 6px 0 0; text-align: center; color: white; font-size: 11px; padding-top: 4px; height: 100px; display: flex; align-items: flex-start; justify-content: center;">100%</div>
-                                <span style="font-size: 11px; color: #666;">医疗服务</span>
+                            <div style="height: 220px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(0,212,255,0.8) 0%, rgba(19,194,194,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 80px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(0,212,255,0.4);">80%</div>
+                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">教育设施</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(82,196,26,0.8) 0%, rgba(56,158,13,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 100px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(82,196,26,0.4);">100%</div>
+                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">医疗服务</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(250,140,22,0.8) 0%, rgba(212,136,6,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 70px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(250,140,22,0.4);">70%</div>
+                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">养老服务</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(139,92,246,0.8) 0%, rgba(83,29,171,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 90px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(139,92,246,0.4);">90%</div>
+                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">文化设施</span>
+                                </div>
                             </div>
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                <div style="width: 40px; background: linear-gradient(180deg, #fa8c16 0%, #d48806 100%); border-radius: 6px 6px 0 0; text-align: center; color: white; font-size: 11px; padding-top: 4px; height: 70px; display: flex; align-items: flex-start; justify-content: center;">70%</div>
-                                <span style="font-size: 11px; color: #666;">养老服务</span>
+                        </div>
+
+                        <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; border: 1px solid rgba(250,140,22,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid rgba(250,140,22,0.3);">
+                                <span style="font-size: 20px;">🏆</span>
+                                <h3 style="font-size: 16px; font-weight: 600; color: #fa8c16;">社区荣誉统计</h3>
                             </div>
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                <div style="width: 40px; background: linear-gradient(180deg, #722ed1 0%, #531dab 100%); border-radius: 6px 6px 0 0; text-align: center; color: white; font-size: 11px; padding-top: 4px; height: 90px; display: flex; align-items: flex-start; justify-content: center;">90%</div>
-                                <span style="font-size: 11px; color: #666;">文化设施</span>
+                            <div style="height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <span style="font-size: 13px; color: rgba(255,255,255,0.6); width: 60px;">省级</span>
+                                    <div style="flex: 1; height: 28px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(0,212,255,0.2);">
+                                        <div style="height: 100%; width: 60%; background: linear-gradient(90deg, rgba(0,212,255,0.8) 0%, rgba(19,194,194,0.6) 100%); display: flex; align-items: center; padding-left: 12px; color: white; font-size: 12px; font-weight: 600; box-shadow: 0 0 10px rgba(0,212,255,0.3);">2项荣誉</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <span style="font-size: 13px; color: rgba(255,255,255,0.6); width: 60px;">市级</span>
+                                    <div style="flex: 1; height: 28px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(82,196,26,0.2);">
+                                        <div style="height: 100%; width: 80%; background: linear-gradient(90deg, rgba(82,196,26,0.8) 0%, rgba(56,158,13,0.6) 100%); display: flex; align-items: center; padding-left: 12px; color: white; font-size: 12px; font-weight: 600; box-shadow: 0 0 10px rgba(82,196,26,0.3);">4项荣誉</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <span style="font-size: 13px; color: rgba(255,255,255,0.6); width: 60px;">区级</span>
+                                    <div style="flex: 1; height: 28px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(250,140,22,0.2);">
+                                        <div style="height: 100%; width: 100%; background: linear-gradient(90deg, rgba(250,140,22,0.8) 0%, rgba(212,136,6,0.6) 100%); display: flex; align-items: center; padding-left: 12px; color: white; font-size: 12px; font-weight: 600; box-shadow: 0 0 10px rgba(250,140,22,0.3);">6项荣誉</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <p style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6;">
+                                    社区先后获评湖北省综合减灾示范社区、洪山区应急服务站示范站等多项荣誉，基层治理成效显著。
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #fa8c16;">
-                            <span style="font-size: 18px;">🏆</span>
-                            <h3 style="font-size: 15px; font-weight: 600; color: #333;">社区荣誉统计</h3>
+                    <div style="background: rgba(10,22,42,0.9); border-radius: 16px; padding: 20px; margin-top: 24px; border: 1px solid rgba(0,212,255,0.15); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="color: #00d4ff; font-size: 16px;">📍</span>
+                            <span style="color: rgba(255,255,255,0.8); font-size: 14px;">地址：武汉市洪山区欢乐大道46号岳家嘴小区3栋1楼</span>
                         </div>
-                        <div style="height: 200px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 14px; color: #666; width: 60px;">省级</span>
-                                <div style="flex: 1; height: 24px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; width: 60%; background: linear-gradient(90deg, #1890ff 0%, #40a9ff 100%); display: flex; align-items: center; padding-left: 10px; color: white; font-size: 12px; font-weight: 500;">2项荣誉</div>
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 14px; color: #666; width: 60px;">市级</span>
-                                <div style="flex: 1; height: 24px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; width: 80%; background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%); display: flex; align-items: center; padding-left: 10px; color: white; font-size: 12px; font-weight: 500;">4项荣誉</div>
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 14px; color: #666; width: 60px;">区级</span>
-                                <div style="flex: 1; height: 24px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; width: 100%; background: linear-gradient(90deg, #fa8c16 0%, #ffa940 100%); display: flex; align-items: center; padding-left: 10px; color: white; font-size: 12px; font-weight: 500;">6项荣誉</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
-                            <p style="font-size: 12px; color: #999; line-height: 1.6;">
-                                社区先后获评湖北省综合减灾示范社区、洪山区应急服务站示范站等多项荣誉，基层治理成效显著。
-                            </p>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="color: #52c41a; font-size: 16px;">📞</span>
+                            <span style="color: rgba(255,255,255,0.8); font-size: 14px;">联系电话：027-88511880</span>
                         </div>
                     </div>
                 </div>
 
-                <div style="background: linear-gradient(135deg, #1a56a5 0%, #0d3b6e 100%); border-radius: 12px; padding: 16px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="color: rgba(255,255,255,0.8); font-size: 14px;">📍</span>
-                        <span style="color: rgba(255,255,255,0.8); font-size: 14px;">地址：武汉市洪山区欢乐大道46号岳家嘴小区3栋1楼</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="color: rgba(255,255,255,0.8); font-size: 14px;">📞</span>
-                        <span style="color: rgba(255,255,255,0.8); font-size: 14px;">联系电话：027-88511880</span>
-                    </div>
-                </div>
+                <style>
+                    @keyframes pulse {
+                        0%, 100% { opacity: 0.5; transform: scale(1); }
+                        50% { opacity: 1; transform: scale(1.1); }
+                    }
+                    @keyframes blink {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.3; }
+                    }
+                </style>
+                <script>
+                    function updateTime() {
+                        const now = new Date();
+                        const timeStr = now.toLocaleString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        const elem = document.getElementById('screen-time');
+                        if (elem) elem.textContent = timeStr;
+                    }
+                    updateTime();
+                    setInterval(updateTime, 1000);
+                </script>
             </div>
 
             <!-- ========== 家政服务 - 首页 ========== -->
