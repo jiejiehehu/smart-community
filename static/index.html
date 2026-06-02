@@ -1108,12 +1108,18 @@
                 
                 <div style="position: relative; z-index: 1;">
                     <div style="background: linear-gradient(135deg, rgba(10,22,42,0.9) 0%, rgba(26,58,90,0.8) 50%, rgba(13,74,61,0.8) 100%); border-radius: 20px; padding: 30px; margin-bottom: 24px; box-shadow: 0 0 40px rgba(0,212,255,0.2), inset 0 0 60px rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2);">
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px;">
-                            <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
-                            <h1 style="color: #00d4ff; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0,212,255,0.5); font-family: 'Microsoft YaHei', sans-serif;">智慧东湖社区</h1>
-                            <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
+                                <h1 style="color: #00d4ff; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0,212,255,0.5); font-family: 'Microsoft YaHei', sans-serif;">智慧东湖社区</h1>
+                                <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
+                            </div>
+                            <button onclick="toggleFullscreen()" id="fullscreen-btn" style="background: linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%); border: 1px solid rgba(0,212,255,0.4); border-radius: 10px; padding: 10px 16px; color: #00d4ff; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Microsoft YaHei', sans-serif; font-weight: 500;">
+                                <span id="fullscreen-icon">⛶</span>
+                                <span id="fullscreen-text">全屏</span>
+                            </button>
                         </div>
-                        <div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 14px;">武汉洪山区梨园街道东湖社区 · 智慧社区管理平台</div>
+                        <div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 12px;">武汉洪山区梨园街道东湖社区 · 智慧社区管理平台</div>
                         <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <span style="width: 8px; height: 8px; background: #52c41a; border-radius: 50%; box-shadow: 0 0 10px #52c41a; animation: blink 2s ease-in-out infinite;"></span>
@@ -1296,6 +1302,70 @@
                     }
                     updateTime();
                     setInterval(updateTime, 1000);
+
+                    function toggleFullscreen() {
+                        const elem = document.getElementById('page-dashboard-screen');
+                        const btn = document.getElementById('fullscreen-btn');
+                        const icon = document.getElementById('fullscreen-icon');
+                        const text = document.getElementById('fullscreen-text');
+                        
+                        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+                            if (elem.requestFullscreen) {
+                                elem.requestFullscreen();
+                            } else if (elem.webkitRequestFullscreen) {
+                                elem.webkitRequestFullscreen();
+                            } else if (elem.mozRequestFullScreen) {
+                                elem.mozRequestFullScreen();
+                            } else if (elem.msRequestFullscreen) {
+                                elem.msRequestFullscreen();
+                            }
+                            icon.textContent = '⛶';
+                            text.textContent = '退出全屏';
+                            btn.style.background = 'linear-gradient(135deg, rgba(82,196,26,0.3) 0%, rgba(56,158,13,0.2) 100%)';
+                            btn.style.borderColor = 'rgba(82,196,26,0.4)';
+                            btn.style.color = '#52c41a';
+                        } else {
+                            if (document.exitFullscreen) {
+                                document.exitFullscreen();
+                            } else if (document.webkitExitFullscreen) {
+                                document.webkitExitFullscreen();
+                            } else if (document.mozCancelFullScreen) {
+                                document.mozCancelFullScreen();
+                            } else if (document.msExitFullscreen) {
+                                document.msExitFullscreen();
+                            }
+                            icon.textContent = '⛶';
+                            text.textContent = '全屏';
+                            btn.style.background = 'linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%)';
+                            btn.style.borderColor = 'rgba(0,212,255,0.4)';
+                            btn.style.color = '#00d4ff';
+                        }
+                    }
+
+                    document.addEventListener('fullscreenchange', updateFullscreenBtn);
+                    document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
+                    document.addEventListener('mozfullscreenchange', updateFullscreenBtn);
+                    document.addEventListener('MSFullscreenChange', updateFullscreenBtn);
+
+                    function updateFullscreenBtn() {
+                        const icon = document.getElementById('fullscreen-icon');
+                        const text = document.getElementById('fullscreen-text');
+                        const btn = document.getElementById('fullscreen-btn');
+                        
+                        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+                            icon.textContent = '⛶';
+                            text.textContent = '退出全屏';
+                            btn.style.background = 'linear-gradient(135deg, rgba(82,196,26,0.3) 0%, rgba(56,158,13,0.2) 100%)';
+                            btn.style.borderColor = 'rgba(82,196,26,0.4)';
+                            btn.style.color = '#52c41a';
+                        } else {
+                            icon.textContent = '⛶';
+                            text.textContent = '全屏';
+                            btn.style.background = 'linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%)';
+                            btn.style.borderColor = 'rgba(0,212,255,0.4)';
+                            btn.style.color = '#00d4ff';
+                        }
+                    }
                 </script>
             </div>
 
