@@ -2659,6 +2659,18 @@ def get_community_doctors():
         result.append(d)
     return jsonify({'code': 0, 'data': result})
 
+@app.route('/api/community/doctors/<int:doctor_id>', methods=['GET'])
+def get_community_doctor(doctor_id):
+    """获取单个医生信息"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM community_doctors WHERE id = ?', (doctor_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return jsonify({'code': 0, 'data': dict(row)})
+    return jsonify({'code': 1, 'message': '医生不存在'})
+
 @app.route('/api/community/doctors', methods=['POST'])
 def create_community_doctor():
     data = request.get_json()
