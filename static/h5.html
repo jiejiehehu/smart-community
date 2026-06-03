@@ -2358,7 +2358,7 @@
                 plate_number: document.getElementById('vsPlate').value,
             };
             const res = await api('api/visitor/records', { method: 'POST', body: JSON.stringify(data) });
-            if (res && res.code === 0) { showH5Toast('邀请发送成功！', 'success'); }
+            if (res && res.code === 0) { showH5Toast('邀请已发送，等待物业确认后生效', 'success'); }
             else { showH5Toast('发送失败，请重试', 'error'); }
         }
 

@@ -856,7 +856,7 @@ def init_mock_data(conn):
         room = random.choice(rooms)
         
         entry_time = (today - timedelta(hours=random.randint(0, 48))).strftime('%Y-%m-%d %H:%M')
-        status = random.choice(['inside', 'outside', 'outside'])
+        status = random.choice(['inside', 'outside', 'outside', 'pending'])
         
         exit_time = None
         if status == 'outside':
@@ -1956,7 +1956,7 @@ def create_visitor_record():
     cursor.execute('''
         INSERT INTO visitor_records
         (visitor_name, visitor_phone, visited_building, visited_unit, visited_room, visited_resident, visit_purpose, entry_time, status, remark)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'inside', ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
     ''', (visitor_name, visitor_phone, visited_building, visited_unit, visited_room,
           visited_resident, visit_purpose, entry_time, remark))
 
@@ -1980,6 +1980,22 @@ def exit_visitor_record(record_id):
     success = cursor.rowcount > 0
     conn.close()
     return jsonify({'code': 0, 'message': '访客已离开'}) if success else jsonify({'code': 1, 'message': '操作失败'})
+
+@app.route('/api/visitor/records/<int:record_id>/confirm', methods=['PUT'])
+def confirm_visitor_record(record_id):
+    """物业确认访客进入"""
+    conn = get_db()
+    cursor = conn.cursor()
+    now = datetime.now().strftime('%Y-%m-%d %H:%M')
+    cursor.execute('''
+        UPDATE visitor_records 
+        SET status = 'inside', entry_time = ?
+        WHERE id = ? AND status = 'pending'
+    ''', (now, record_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return jsonify({'code': 0, 'message': '已确认访客进入'}) if success else jsonify({'code': 1, 'message': '确认失败，记录不存在或已处理'})
 
 # ============ 公告通知API ============
 

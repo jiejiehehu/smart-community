@@ -2380,7 +2380,7 @@
         const ctStatusMap = { 'pending': '待确认', 'confirmed': '已确认', 'completed': '已完成' };
         const propStatusMap = { 'unpaid': '待缴费', 'paid': '已缴费', 'overdue': '已逾期' };
         const repairStatusMap = { 'pending': '待受理', 'assigned': '已派单', 'processing': '维修中', 'completed': '已完成' };
-        const visitorStatusMap = { 'inside': '在访中', 'outside': '已离开' };
+        const visitorStatusMap = { 'pending': '待确认', 'inside': '在访中', 'outside': '已离开' };
         const sosStatusMap = { 'pending': '待处理', 'handling': '处理中', 'handled': '已处理' };
         const careStatusMap = { 'active': '进行中', 'completed': '已完成' };
         const parkingStatusMap = { 'available': '空闲', 'occupied': '已占用', 'reserved': '已预留' };
@@ -2961,24 +2961,27 @@
         
         // ========== 访客管理 ==========
         async function loadVisitorInside() {
-            const res = await api('/api/visitor/records?status=inside');
-            document.getElementById('visitor-inside').textContent = (res.data || []).length;
-            document.getElementById('visitor-today').textContent = (res.data || []).length;
+            const insideRes = await api('/api/visitor/records?status=inside');
+            const pendingRes = await api('/api/visitor/records?status=pending');
+            document.getElementById('visitor-inside').textContent = (insideRes.data || []).length;
+            document.getElementById('visitor-today').textContent = (pendingRes.data || []).length + (insideRes.data || []).filter(v => v.entry_time && v.entry_time.slice(0,10) === new Date().toISOString().slice(0,10)).length;
             const allRes = await api('/api/visitor/records');
             document.getElementById('visitor-total').textContent = (allRes.data || []).length;
-            document.getElementById('visitor-inside-tbody').innerHTML = (res.data || []).map(v => `<tr><td>${v.visitor_name}</td><td>${v.visitor_phone||'-'}</td><td>${v.visited_building||''} ${v.visited_resident||''}</td><td>${v.visit_purpose}</td><td>${v.entry_time||'-'}</td><td>${badge(v.status, visitorStatusMap)}</td><td><button class="btn btn-outline btn-sm" onclick="exitVisitor(${v.id})">登记离开</button></td></tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;">暂无在访人员</td></tr>';
+            var allDisplay = (pendingRes.data || []).concat(insideRes.data || []);
+            document.getElementById('visitor-inside-tbody').innerHTML = allDisplay.map(v => `<tr><td>${v.visitor_name}</td><td>${v.visitor_phone||'-'}</td><td>${v.visited_building||''} ${v.visited_resident||''}</td><td>${v.visit_purpose}</td><td>${v.entry_time||'-'}</td><td>${badge(v.status, visitorStatusMap)}</td><td>${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="confirmVisitor(${v.id})">确认进入</button>`:v.status==='inside'?`<button class="btn btn-outline btn-sm" onclick="exitVisitor(${v.id})">登记离开</button>`:'-'}</td></tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;">暂无访客</td></tr>';
         }
-        async function exitVisitor(id) { const res = await api(`/api/visitor/records/${id}/exit`, { method: 'PUT' }); if (res.code === 0) { showToast('已登记离开', 'success'); loadVisitorInside(); } }
+        async function confirmVisitor(id) { const res = await api(`/api/visitor/records/${id}/confirm`, { method: 'PUT' }); if (res.code === 0) { showToast('已确认进入', 'success'); loadVisitorInside(); } else { showToast('确认失败', 'error'); } }
+        async function exitVisitor(id) { const res = await api(`/api/visitor/records/${id}/exit`, { method: 'PUT' }); if (res.code === 0) { showToast('已登记离开', 'success'); loadVisitorInside(); loadVisitorRecords(); } }
         async function submitVisitorRecord() {
             const data = { visitor_name: document.getElementById('visitor-name').value, visitor_phone: document.getElementById('visitor-phone').value, visited_building: document.getElementById('visitor-building').value, visited_unit: document.getElementById('visitor-unit').value, visited_room: document.getElementById('visitor-room').value, visited_resident: document.getElementById('visitor-resident').value, visit_purpose: document.getElementById('visitor-purpose').value };
             if (!data.visitor_name || !data.visited_building || !data.visited_resident) { showToast('请填写必填项', 'error'); return; }
             const res = await api('/api/visitor/records', { method: 'POST', body: JSON.stringify(data) });
-            if (res.code === 0) { showToast('登记成功', 'success'); showPage('visitor-home'); }
+            if (res.code === 0) { showToast('已提交，等待物业确认后生效', 'success'); showPage('visitor-home'); }
         }
         async function loadVisitorRecords() {
             const status = document.getElementById('visitor-filter-status')?.value || '';
             const res = await api('/api/visitor/records' + (status ? '?status=' + status : ''));
-            document.getElementById('visitor-records-tbody').innerHTML = (res.data || []).map(v => `<tr><td>${v.visitor_name}</td><td>${v.visitor_phone||'-'}</td><td>${v.visited_building||''} ${v.visited_resident||''}</td><td>${v.visit_purpose}</td><td>${v.entry_time||'-'}</td><td>${v.exit_time||'-'}</td><td>${badge(v.status, visitorStatusMap)}</td><td>${v.status==='inside'?`<button class="btn btn-outline btn-sm" onclick="exitVisitor(${v.id})">登记离开</button>`:'-'}</td></tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:#999;">暂无数据</td></tr>';
+            document.getElementById('visitor-records-tbody').innerHTML = (res.data || []).map(v => `<tr><td>${v.visitor_name}</td><td>${v.visitor_phone||'-'}</td><td>${v.visited_building||''} ${v.visited_resident||''}</td><td>${v.visit_purpose}</td><td>${v.entry_time||'-'}</td><td>${v.exit_time||'-'}</td><td>${badge(v.status, visitorStatusMap)}</td><td>${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="confirmVisitor(${v.id})">确认进入</button>`:v.status==='inside'?`<button class="btn btn-outline btn-sm" onclick="exitVisitor(${v.id})">登记离开</button>`:'-'}</td></tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:#999;">暂无数据</td></tr>';
         }
         
         // ========== 公告通知 ==========
