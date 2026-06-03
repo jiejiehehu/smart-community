@@ -79,8 +79,9 @@ python3 app.py
 - ✅ 通行记录：进出时间记录、在访状态
 
 ### 📢 公告通知
-- ✅ 公告管理：发布、编辑、删除
+- ✅ 公告管理：发布、查看详情、编辑、删除
 - ✅ 紧急通知：紧急标记、置顶功能
+- ✅ PC/H5联动：H5端首页+消息中心实时同步
 
 ### 🚗 车位管理
 - ✅ 车位信息：占用情况、月卡管理
@@ -167,6 +168,9 @@ python3 app.py
 ├── requirements.txt        # Python依赖
 ├── render.yaml             # 部署配置
 ├── README.md               # 本文档
+├── SPEC.md                 # 需求规格说明书
+├── TASKS.md                # 任务分解清单
+├── CHECKLIST.md            # 验收检查清单
 ├── API对接完成说明.md       # API对接说明
 ├── static/                 # 前端静态文件
 │   ├── index.html          # PC管理端页面
