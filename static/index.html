@@ -2675,7 +2675,21 @@
         }
         function openDishModal() { showModal('新增菜品', '<div class="form-group" style="margin-bottom:12px"><label>菜品名称</label><input class="form-input" id="dish-name"></div><div class="form-group" style="margin-bottom:12px"><label>分类</label><select class="form-select" id="dish-cat"><option>荤菜</option><option>素菜</option><option>凉菜</option><option>汤类</option><option>主食</option></select></div><div class="form-group" style="margin-bottom:12px"><label>单价</label><input class="form-input" id="dish-price" type="number"></div><div class="form-group"><label>单位</label><input class="form-input" id="dish-unit" value="份"></div>', '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitDish()">确定</button>'); }
         async function submitDish() { const res = await api('/api/canteen/dishes', { method: 'POST', body: JSON.stringify({ name: document.getElementById('dish-name').value, category: document.getElementById('dish-cat').value, price: parseFloat(document.getElementById('dish-price').value), unit: document.getElementById('dish-unit').value }) }); if (res.code === 0) { showToast('添加成功', 'success'); closeModal(); loadDishes(); } }
-        async function editDish(id) { showToast('编辑功能开发中', 'info'); }
+        var currentEditDishId = null;
+        async function editDish(id) {
+            const res = await api('/api/canteen/dishes');
+            const d = (res.data||[]).find(x => x.id === id);
+            if (!d) return;
+            currentEditDishId = id;
+            var cats = ['荤菜','素菜','凉菜','汤类','主食'];
+            var opts = cats.map(c => '<option value="' + c + '"' + (d.category === c ? ' selected' : '') + '>' + c + '</option>').join('');
+            showModal('编辑菜品', '<div class="form-group" style="margin-bottom:12px"><label>菜品名称</label><input class="form-input" id="dish-name" value="' + (d.name||'').replace(/"/g,'&quot;') + '"></div><div class="form-group" style="margin-bottom:12px"><label>分类</label><select class="form-select" id="dish-cat">' + opts + '</select></div><div class="form-group" style="margin-bottom:12px"><label>单价</label><input class="form-input" id="dish-price" type="number" value="' + (d.price||0) + '"></div><div class="form-group"><label>单位</label><input class="form-input" id="dish-unit" value="' + (d.unit||'份') + '"></div>', '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitEditDish()">保存</button>');
+        }
+        async function submitEditDish() {
+            const res = await api('/api/canteen/dishes/' + currentEditDishId, { method: 'PUT', body: JSON.stringify({ name: document.getElementById('dish-name').value, category: document.getElementById('dish-cat').value, price: parseFloat(document.getElementById('dish-price').value), unit: document.getElementById('dish-unit').value }) });
+            if (res.code === 0) { showToast('更新成功', 'success'); closeModal(); loadDishes(); }
+            else { showToast('更新失败', 'error'); }
+        }
         async function deleteDish(id) { if (!confirm('确定删除?')) return; const res = await api(`/api/canteen/dishes/${id}`, { method: 'DELETE' }); if (res.code === 0) { showToast('删除成功', 'success'); loadDishes(); } }
         function openOrderModal() { showToast('请从食堂概览页面进行订餐操作', 'info'); }
         async function loadAllCanteenOrders() {
@@ -3053,7 +3067,19 @@
             const res = await api('/api/parking/spaces' + (status ? '?status=' + status : ''));
             document.getElementById('park-all-spaces-tbody').innerHTML = (res.data || []).map(s => `<tr><td>${s.space_no}</td><td>${s.area}</td><td>${s.space_type==='normal'?'普通':s.space_type==='large'?'大车位':'充电桩'}</td><td>${s.plate_no||'-'}</td><td>${s.resident_name||'-'}</td><td>¥${s.monthly_fee||300}</td><td>${s.card_end_date||'-'}</td><td>${badge(s.status, parkingStatusMap)}</td><td><button class="btn btn-outline btn-sm" onclick="editParkingSpace(${s.id})">编辑</button></td></tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:#999;">暂无数据</td></tr>';
         }
-        function editParkingSpace(id) { showToast('车位编辑功能开发中', 'info'); }
+        var currentEditPsId = null;
+        async function editParkingSpace(id) {
+            const res = await api('/api/parking/spaces');
+            const s = (res.data||[]).find(x => x.id === id);
+            if (!s) return;
+            currentEditPsId = id;
+            showModal('编辑车位 ' + s.space_no, '<div class="form-row"><div class="form-group"><label>住户姓名</label><input class="form-input" id="ps-name" value="' + (s.resident_name||'') + '"></div><div class="form-group"><label>联系电话</label><input class="form-input" id="ps-phone" value="' + (s.resident_phone||'') + '"></div><div class="form-group"><label>车牌号</label><input class="form-input" id="ps-plate" value="' + (s.plate_no||'') + '"></div></div><div class="form-row"><div class="form-group"><label>月卡开始</label><input class="form-input" id="ps-card-start" type="date" value="' + (s.card_start_date||'') + '"></div><div class="form-group"><label>月卡结束</label><input class="form-input" id="ps-card-end" type="date" value="' + (s.card_end_date||'') + '"></div></div>', '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitEditParkingSpace()">保存</button>');
+        }
+        async function submitEditParkingSpace() {
+            const res = await api('/api/parking/spaces/' + currentEditPsId, { method: 'PUT', body: JSON.stringify({ resident_name: document.getElementById('ps-name').value, resident_phone: document.getElementById('ps-phone').value, plate_no: document.getElementById('ps-plate').value, card_start_date: document.getElementById('ps-card-start').value, card_end_date: document.getElementById('ps-card-end').value }) });
+            if (res.code === 0) { showToast('更新成功', 'success'); closeModal(); loadParkingSpacesAll(); loadParkingSpaces(); }
+            else { showToast('更新失败', 'error'); }
+        }
         function openParkingSpaceModal() { showModal('添加车位', '<div class="form-row"><div class="form-group"><label>车位编号</label><input class="form-input" id="ps-no"></div><div class="form-group"><label>区域</label><select class="form-select" id="ps-area"><option>A区</option><option>B区</option><option>C区</option><option>地下一层</option><option>地下二层</option></select></div><div class="form-group"><label>类型</label><select class="form-select" id="ps-type"><option value="normal">普通</option><option value="large">大车位</option><option value="electric">充电桩</option></select></div></div>', '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitParkingSpace()">确定</button>'); }
         async function submitParkingSpace() { const res = await api('/api/parking/spaces', { method: 'POST', body: JSON.stringify({ space_no: document.getElementById('ps-no').value, area: document.getElementById('ps-area').value, space_type: document.getElementById('ps-type').value }) }); if (res.code === 0) { showToast('添加成功', 'success'); closeModal(); loadParkingSpacesAll(); } }
         async function loadParkingRecords() {

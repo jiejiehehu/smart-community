@@ -376,6 +376,14 @@
         .menu-desc { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
         .menu-price { font-size: 15px; font-weight: 600; color: var(--color-danger); }
 
+        /* --- 订单详情 --- */
+        .detail-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { font-size: 13px; color: var(--color-text-tertiary); }
+
         .submit-btn {
             width: 100%; padding: 14px; background: var(--color-primary-gradient);
             color: white; border: none; border-radius: 25px; font-size: 16px;
@@ -1328,7 +1336,48 @@
             list.insertAdjacentHTML('beforeend', html);
         }
         function showOrderDetail(id, type) {
-            showH5Toast('订单详情开发中', 'info');
+            api('api/my-orders').then(res => {
+                var o = (res.data||[]).find(x => x.id === id);
+                if (!o) { showH5Toast('订单未找到', 'error'); return; }
+                var statusMap = {pending:'待处理',accepted:'已接单',processing:'服务中',pending_review:'待评价',completed:'已完成',cancelled:'已取消'};
+                var typeLabel = o.order_type === 'repair' ? '🔧 报修' : '💊 康养';
+                var html = '<div style="padding:8px 0;">' +
+                    '<div style="background:#fafafa;border-radius:12px;padding:16px;margin-bottom:12px;">' +
+                    '<div style="font-size:13px;color:#999;margin-bottom:8px;">' + typeLabel + '</div>' +
+                    '<h3 style="font-size:17px;color:#333;margin:0 0 8px;">' + (o.service_desc || o.service_type || '订单详情') + '</h3>' +
+                    '<span class="status-tag ' + ({pending:'warning',accepted:'info',processing:'primary',completed:'success',cancelled:'default'}[o.status]||'default') + '" style="font-size:12px;">' + (statusMap[o.status]||o.status) + '</span>' +
+                    '</div>' +
+                    '<div style="padding:4px 0;">' +
+                    '<div class="detail-row"><span class="detail-label">订单编号</span><span>' + (o.order_no||'-') + '</span></div>' +
+                    '<div class="detail-row"><span class="detail-label">服务类型</span><span>' + (o.service_type||'-') + '</span></div>' +
+                    '<div class="detail-row"><span class="detail-label">预约时间</span><span>' + (o.book_time||'-') + '</span></div>' +
+                    '<div class="detail-row"><span class="detail-label">创建时间</span><span>' + (o.created_at||'-') + '</span></div>' +
+                    '</div>' +
+                    '</div>';
+                var headerEl = document.querySelector('#page-my-orders .header-back');
+                if (headerEl) headerEl.onclick = function() { showPage('my-orders'); };
+                var contentEl = document.querySelector('#page-my-orders .detail-content') || document.getElementById('myOrdersList')?.parentElement;
+                if (contentEl) {
+                    // Add back button and detail
+                    var detailDiv = document.createElement('div');
+                    detailDiv.innerHTML = html;
+                    detailDiv.style.padding = '16px';
+                    // Hide list, show detail
+                    var listEl = document.getElementById('myOrdersList');
+                    var emptyEl = document.getElementById('ordersEmpty');
+                    if (listEl) listEl.style.display = 'none';
+                    if (emptyEl) emptyEl.style.display = 'none';
+                    // Remove previous detail
+                    var prevDetail = contentEl.querySelector('.order-detail-view');
+                    if (prevDetail) prevDetail.remove();
+                    detailDiv.className = 'order-detail-view';
+                    // Add close button at top
+                    detailDiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:0 4px;">' +
+                        '<span onclick="showPage(\'my-orders\')" style="font-size:18px;color:#1890ff;cursor:pointer;">← 返回</span>' +
+                        '<span style="font-size:15px;font-weight:600;color:#333;">订单详情</span><span style="width:40px;"></span></div>' + html;
+                    contentEl.appendChild(detailDiv);
+                }
+            }).catch(function(){ showH5Toast('加载失败', 'error'); });
         }
 
         // ========== 健康档案 CRUD ==========
@@ -2004,7 +2053,22 @@
                     '</div>';
                 setTimeout(loadActivityList, 100);
             } else {
-                html = '<div class="form-card"><div class="form-title">🚧 开发中</div><p style="padding:16px;color:#999;">该功能正在开发中，敬请期待！</p></div>';
+                // 未知服务类型，显示所有可用服务
+                var cats = [
+                    {key:'housekeeping',icon:'🧹',color:'#e6f7ff',label:'家政服务'},
+                    {key:'canteen',icon:'🍽️',color:'#fff7e6',label:'社区食堂'},
+                    {key:'repair',icon:'🔧',color:'#f0f5ff',label:'报修服务'},
+                    {key:'property',icon:'🏦',color:'#f6ffed',label:'物业缴费'},
+                    {key:'visitor',icon:'📨',color:'#fff0f6',label:'访客管理'},
+                    {key:'parking',icon:'🅿️',color:'#e6fffb',label:'车位服务'},
+                    {key:'health',icon:'❤️',color:'#fff1f0',label:'健康服务'},
+                    {key:'more',icon:'🎉',color:'#f5f5f5',label:'社区活动'}
+                ];
+                html = '<div class="form-card"><div class="form-title">📋 全部服务</div></div>' +
+                    cats.map(c => '<div class="service-category-card" onclick="showPage(\'service\',\'' + c.key + '\')">' +
+                    '<div class="category-icon">' + c.icon + '</div>' +
+                    '<div class="category-info"><h3>' + c.label + '</h3></div>' +
+                    '<span class="category-arrow">›</span></div>').join('');
             }
             content.innerHTML = html;
         }
