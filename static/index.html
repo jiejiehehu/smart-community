@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧社区物业管理平台</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231890ff'/%3E%3Cstop offset='100%25' stop-color='%23096dd9'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Arial'%3E🏠%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="design-system.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -931,8 +932,8 @@
                     <span class="menu-arrow">▶</span>
                 </div>
                 <div class="submenu show" id="submenu-dashboard">
-                    <div class="submenu-item active" data-page="dashboard-home" onclick="showPage('dashboard-home')">· 社区总览</div>
-                    <div class="submenu-item" data-page="dashboard-screen" onclick="showPage('dashboard-screen')">· 社区大屏</div>
+                    <div class="submenu-item active" data-page="dashboard-home" onclick="showPage('dashboard-home')">🏠 社区总览</div>
+                    <div class="submenu-item" data-page="dashboard-screen" onclick="showPage('dashboard-screen')">📺 社区大屏</div>
                 </div>
                 
                 <div class="menu-item has-submenu" onclick="toggleSubmenu(this)" data-module="housekeeping">
@@ -1100,272 +1101,298 @@
                 </div>
             </div>
             
-            <!-- ========== 社区大屏展示 - 科技版 ========== -->
-            <div id="page-dashboard-screen" class="page-content" style="background: linear-gradient(135deg, #0a0e17 0%, #0d1526 50%, #0a1628 100%); min-height: calc(100vh - 100px); padding: 20px; margin: -20px -20px -20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none;"></div>
-                <div style="position: absolute; top: 20%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%); border-radius: 50%; animation: pulse 4s ease-in-out infinite;"></div>
-                <div style="position: absolute; bottom: 20%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%); border-radius: 50%; animation: pulse 5s ease-in-out infinite 1s;"></div>
+            <!-- ========== 社区大屏展示 - 全新可视化版 ========== -->
+            <div id="page-dashboard-screen" class="page-content screen-wrapper" style="min-height:calc(100vh - 100px);margin:-20px;position:relative;overflow:hidden;background:linear-gradient(180deg,#0a1628 0%,#0d2137 30%,#0f2a45 60%,#0a1628 100%);">
+                <!-- 网格背景 -->
+                <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+                <!-- 光效 -->
+                <div style="position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:250px;background:radial-gradient(ellipse,rgba(0,180,255,0.12) 0%,transparent 70%);pointer-events:none;"></div>
                 
-                <div style="position: relative; z-index: 1;">
-                    <div style="background: linear-gradient(135deg, rgba(10,22,42,0.9) 0%, rgba(26,58,90,0.8) 50%, rgba(13,74,61,0.8) 100%); border-radius: 20px; padding: 30px; margin-bottom: 24px; box-shadow: 0 0 40px rgba(0,212,255,0.2), inset 0 0 60px rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2);">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <div style="display: flex; align-items: center; gap: 16px;">
-                                <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
-                                <h1 style="color: #00d4ff; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0,212,255,0.5); font-family: 'Microsoft YaHei', sans-serif;">智慧东湖社区</h1>
-                                <div style="width: 3px; height: 32px; background: linear-gradient(180deg, #00d4ff 0%, transparent 100%); border-radius: 2px;"></div>
+                <div style="position:relative;z-index:1;padding:16px 20px;">
+                    <!-- ===== 顶部标题栏 ===== -->
+                    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;">
+                        <div style="position:absolute;left:0;display:flex;align-items:center;gap:8px;">
+                            <button onclick="switchModule('dashboard')" style="background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.3);color:#00b4ff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">← 返回</button>
+                        </div>
+                        <div style="text-align:center;">
+                            <h1 style="color:#fff;font-size:30px;font-weight:700;letter-spacing:6px;margin:0;background:linear-gradient(180deg,#fff 30%,#00b4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">智慧东湖社区 · 综合管理可视化平台</h1>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px;">
+                                <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#00b4ff);"></div>
+                                <span style="color:rgba(255,255,255,0.5);font-size:12px;letter-spacing:2px;">DONGHU COMMUNITY</span>
+                                <div style="width:60px;height:2px;background:linear-gradient(90deg,#00b4ff,transparent);"></div>
                             </div>
-                            <button onclick="toggleFullscreen()" id="fullscreen-btn" style="background: linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%); border: 1px solid rgba(0,212,255,0.4); border-radius: 10px; padding: 10px 16px; color: #00d4ff; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Microsoft YaHei', sans-serif; font-weight: 500;">
-                                <span id="fullscreen-icon">⛶</span>
-                                <span id="fullscreen-text">全屏</span>
+                        </div>
+                        <div style="position:absolute;right:0;display:flex;align-items:center;gap:12px;">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span style="width:8px;height:8px;background:#52c41a;border-radius:50%;box-shadow:0 0 8px #52c41a;animation:screenBlink 2s infinite;"></span>
+                                <span style="color:rgba(255,255,255,0.6);font-size:12px;">运行中</span>
+                            </div>
+                            <span style="color:rgba(255,255,255,0.6);font-size:13px;font-family:monospace;" id="screen-time">2026-06-03 10:00:00</span>
+                            <button onclick="toggleFullscreen()" id="fullscreen-btn" style="background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.4);color:#00b4ff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">
+                                <span id="fullscreen-icon">⛶</span> <span id="fullscreen-text">全屏</span>
                             </button>
                         </div>
-                        <div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 12px;">武汉洪山区梨园街道东湖社区 · 智慧社区管理平台</div>
-                        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px;">
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <span style="width: 8px; height: 8px; background: #52c41a; border-radius: 50%; box-shadow: 0 0 10px #52c41a; animation: blink 2s ease-in-out infinite;"></span>
-                                <span style="color: rgba(255,255,255,0.6); font-size: 12px;">系统运行正常</span>
-                            </div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 12px;" id="screen-time">2026-06-01 10:00:00</div>
+                    </div>
+
+                    <!-- ===== 核心指标行 ===== -->
+                    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px;">
+                        <div class="screen-stat-card" style="--accent:#00b4ff;">
+                            <div class="s-stat-top"><span class="s-stat-icon">👥</span><span class="s-stat-label">辖区人口</span></div>
+                            <div class="s-stat-value">15,000<span class="s-stat-unit">人</span></div>
+                            <div class="s-stat-sub">4800+户 · 8个小区</div>
+                        </div>
+                        <div class="screen-stat-card" style="--accent:#52c41a;">
+                            <div class="s-stat-top"><span class="s-stat-icon">🧹</span><span class="s-stat-label">家政订单</span></div>
+                            <div class="s-stat-value">156<span class="s-stat-unit">单</span></div>
+                            <div class="s-stat-sub">本月累计 · 98%满意</div>
+                        </div>
+                        <div class="screen-stat-card" style="--accent:#fa8c16;">
+                            <div class="s-stat-top"><span class="s-stat-icon">💰</span><span class="s-stat-label">物业缴费率</span></div>
+                            <div class="s-stat-value">92.3<span class="s-stat-unit">%</span></div>
+                            <div class="s-stat-sub">23户待缴 · 5月</div>
+                        </div>
+                        <div class="screen-stat-card" style="--accent:#8b5cf6;">
+                            <div class="s-stat-top"><span class="s-stat-icon">🔧</span><span class="s-stat-label">报修处理</span></div>
+                            <div class="s-stat-value">12<span class="s-stat-unit">单</span></div>
+                            <div class="s-stat-sub">待处理 · 85%完成率</div>
+                        </div>
+                        <div class="screen-stat-card" style="--accent:#13c2c2;">
+                            <div class="s-stat-top"><span class="s-stat-icon">🚗</span><span class="s-stat-label">车位使用率</span></div>
+                            <div class="s-stat-value">78.5<span class="s-stat-unit">%</span></div>
+                            <div class="s-stat-sub">空余128个 · 570车位</div>
                         </div>
                     </div>
 
-                    <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid rgba(0,212,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div style="width: 4px; height: 20px; background: linear-gradient(180deg, #00d4ff 0%, #13c2c2 100%); border-radius: 2px;"></div>
-                            <h2 style="color: #00d4ff; font-size: 18px; font-weight: 600;">🏘️ 社区基础信息</h2>
+                    <!-- ===== 功能模块快捷入口 ===== -->
+                    <div style="background:rgba(0,150,255,0.04);border:1px solid rgba(0,180,255,0.12);border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:3px;height:18px;background:linear-gradient(180deg,#00b4ff,#8b5cf6);border-radius:2px;"></div>
+                            <span style="color:#00b4ff;font-size:15px;font-weight:600;">⚡ 功能模块快捷入口</span>
                         </div>
-                        <p style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.8; text-indent: 2em; margin-bottom: 12px;">
-                            东湖社区隶属于武汉市洪山区梨园街道，2009年9月正式成立，党群服务中心位于欢乐大道46号岳家嘴小区3栋1楼。社区地处欢乐大道与中北路交汇处，紧邻东湖风景区、徐东商圈，毗邻地铁4号线、8号线岳家嘴站，交通便利。
-                        </p>
-                        <p style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.8; text-indent: 2em;">
-                            社区总面积约0.23平方公里，划分16个网格，辖岳家嘴职工小区、东湖花园、东湖睿园等8个住宅小区，共计57栋楼栋，现有居民4800余户、常住人口约15000人，属于商品房、单位宿舍、还建房并存的混合型社区。
-                        </p>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; padding-top: 20px; border-top: 1px dashed rgba(0,212,255,0.2);">
-                            <div style="background: rgba(0,212,255,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(0,212,255,0.15); transition: all 0.3s; cursor: pointer;">
-                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(0,212,255,0.2);">🗺️</div>
-                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">辖区面积</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.5);">0.23<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">平方公里</span></div>
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+                            <div class="screen-func-card" onclick="switchModule('housekeeping')" style="--bg:rgba(0,180,255,0.1);--border:rgba(0,180,255,0.25);">
+                                <div class="sfc-icon" style="background:linear-gradient(135deg,rgba(0,180,255,0.2),rgba(0,140,220,0.1));">🧹</div>
+                                <div class="sfc-name">家政服务</div>
+                                <div class="sfc-desc">预约·派单·评价</div>
                             </div>
-                            <div style="background: rgba(82,196,26,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(82,196,26,0.15); transition: all 0.3s; cursor: pointer;">
-                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(82,196,26,0.3) 0%, rgba(56,158,13,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(82,196,26,0.2);">🏢</div>
-                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">居民楼房</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #52c41a; text-shadow: 0 0 10px rgba(82,196,26,0.5);">57<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">栋</span></div>
+                            <div class="screen-func-card" onclick="switchModule('canteen')" style="--bg:rgba(250,140,22,0.1);--border:rgba(250,140,22,0.25);">
+                                <div class="sfc-icon" style="background:linear-gradient(135deg,rgba(250,140,22,0.2),rgba(210,120,10,0.1));">🍽️</div>
+                                <div class="sfc-name">食堂管理</div>
+                                <div class="sfc-desc">菜谱·订餐·库存</div>
                             </div>
-                            <div style="background: rgba(250,140,22,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(250,140,22,0.15); transition: all 0.3s; cursor: pointer;">
-                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(250,140,22,0.3) 0%, rgba(212,136,6,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(250,140,22,0.2);">🏠</div>
-                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">住宅小区</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #fa8c16; text-shadow: 0 0 10px rgba(250,140,22,0.5);">8<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">个</span></div>
+                            <div class="screen-func-card" onclick="switchModule('property')" style="--bg:rgba(82,196,26,0.1);--border:rgba(82,196,26,0.25);">
+                                <div class="sfc-icon" style="background:linear-gradient(135deg,rgba(82,196,26,0.2),rgba(56,158,13,0.1));">💰</div>
+                                <div class="sfc-name">物业缴费</div>
+                                <div class="sfc-desc">账单·收费·统计</div>
                             </div>
-                            <div style="background: rgba(139,92,246,0.08); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(139,92,246,0.15); transition: all 0.3s; cursor: pointer;">
-                                <div style="width: 56px; height: 56px; margin: 0 auto 12px; background: linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(83,29,171,0.2) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(139,92,246,0.2);">📊</div>
-                                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">社区网格</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #8b5cf6; text-shadow: 0 0 10px rgba(139,92,246,0.5);">16<span style="font-size: 12px; color: rgba(255,255,255,0.5); margin-left: 2px;">个</span></div>
+                            <div class="screen-func-card" onclick="switchModule('repair')" style="--bg:rgba(255,77,79,0.1);--border:rgba(255,77,79,0.25);">
+                                <div class="sfc-icon" style="background:linear-gradient(135deg,rgba(255,77,79,0.2),rgba(200,40,40,0.1));">🔧</div>
+                                <div class="sfc-name">报修管理</div>
+                                <div class="sfc-desc">工单·派单·进度</div>
+                            </div>
+                            <div class="screen-func-card" onclick="switchModule('health')" style="--bg:rgba(139,92,246,0.1);--border:rgba(139,92,246,0.25);">
+                                <div class="sfc-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(83,29,171,0.1));">❤️</div>
+                                <div class="sfc-name">康养服务</div>
+                                <div class="sfc-desc">健康·SOS·照护</div>
+                            </div>
+                            <div class="screen-func-card" onclick="switchModule('activity')" style="--bg:rgba(19,194,194,0.1);--border:rgba(19,194,194,0.25);">
+                                <div class="sfc-icon" style="background:linear-gradient(135deg,rgba(19,194,194,0.2),rgba(10,150,150,0.1));">🎉</div>
+                                <div class="sfc-name">社区活动</div>
+                                <div class="sfc-desc">发布·报名·统计</div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                        <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; border: 1px solid rgba(0,212,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid rgba(0,212,255,0.3);">
-                                <span style="font-size: 20px;">👥</span>
-                                <h3 style="font-size: 16px; font-weight: 600; color: #00d4ff;">社区人口结构</h3>
-                            </div>
-                            <div style="height: 220px; display: flex; align-items: center; justify-content: center;">
-                                <div style="position: relative; width: 150px; height: 150px;">
-                                    <svg viewBox="0 0 100 100">
-                                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="12"/>
-                                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient1)" stroke-width="12" stroke-dasharray="238 283" stroke-dashoffset="0" transform="rotate(-90 50 50)" stroke-linecap="round"/>
-                                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient2)" stroke-width="12" stroke-dasharray="45 283" stroke-dashoffset="-238" transform="rotate(-90 50 50)" stroke-linecap="round"/>
-                                        <defs>
-                                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stop-color="#00d4ff"/>
-                                                <stop offset="100%" stop-color="#13c2c2"/>
-                                            </linearGradient>
-                                            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stop-color="#52c41a"/>
-                                                <stop offset="100%" stop-color="#389e0d"/>
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                                        <div style="font-size: 24px; font-weight: 700; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.5);">15000</div>
-                                        <div style="font-size: 12px; color: rgba(255,255,255,0.5);">常住人口</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff 0%, #13c2c2 100%); box-shadow: 0 0 10px rgba(0,212,255,0.5);"></div>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.7);">常住人口 13500人</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); box-shadow: 0 0 10px rgba(82,196,26,0.5);"></div>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.7);">流动人口 1500人</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; border: 1px solid rgba(82,196,26,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid rgba(82,196,26,0.3);">
-                                <span style="font-size: 20px;">🏫</span>
-                                <h3 style="font-size: 16px; font-weight: 600; color: #52c41a;">社区配套服务</h3>
-                            </div>
-                            <div style="height: 220px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px;">
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(0,212,255,0.8) 0%, rgba(19,194,194,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 80px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(0,212,255,0.4);">80%</div>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">教育设施</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(82,196,26,0.8) 0%, rgba(56,158,13,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 100px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(82,196,26,0.4);">100%</div>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">医疗服务</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(250,140,22,0.8) 0%, rgba(212,136,6,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 70px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(250,140,22,0.4);">70%</div>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">养老服务</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                    <div style="width: 50px; background: linear-gradient(180deg, rgba(139,92,246,0.8) 0%, rgba(83,29,171,0.6) 100%); border-radius: 8px 8px 0 0; text-align: center; color: white; font-size: 12px; font-weight: 600; padding-top: 6px; height: 90px; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 0 15px rgba(139,92,246,0.4);">90%</div>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">文化设施</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="background: rgba(10,22,42,0.8); border-radius: 16px; padding: 24px; border: 1px solid rgba(250,140,22,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid rgba(250,140,22,0.3);">
-                                <span style="font-size: 20px;">🏆</span>
-                                <h3 style="font-size: 16px; font-weight: 600; color: #fa8c16;">社区荣誉统计</h3>
-                            </div>
-                            <div style="height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
-                                <div style="display: flex; align-items: center; gap: 14px;">
-                                    <span style="font-size: 13px; color: rgba(255,255,255,0.6); width: 60px;">省级</span>
-                                    <div style="flex: 1; height: 28px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(0,212,255,0.2);">
-                                        <div style="height: 100%; width: 60%; background: linear-gradient(90deg, rgba(0,212,255,0.8) 0%, rgba(19,194,194,0.6) 100%); display: flex; align-items: center; padding-left: 12px; color: white; font-size: 12px; font-weight: 600; box-shadow: 0 0 10px rgba(0,212,255,0.3);">2项荣誉</div>
-                                    </div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 14px;">
-                                    <span style="font-size: 13px; color: rgba(255,255,255,0.6); width: 60px;">市级</span>
-                                    <div style="flex: 1; height: 28px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(82,196,26,0.2);">
-                                        <div style="height: 100%; width: 80%; background: linear-gradient(90deg, rgba(82,196,26,0.8) 0%, rgba(56,158,13,0.6) 100%); display: flex; align-items: center; padding-left: 12px; color: white; font-size: 12px; font-weight: 600; box-shadow: 0 0 10px rgba(82,196,26,0.3);">4项荣誉</div>
-                                    </div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 14px;">
-                                    <span style="font-size: 13px; color: rgba(255,255,255,0.6); width: 60px;">区级</span>
-                                    <div style="flex: 1; height: 28px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(250,140,22,0.2);">
-                                        <div style="height: 100%; width: 100%; background: linear-gradient(90deg, rgba(250,140,22,0.8) 0%, rgba(212,136,6,0.6) 100%); display: flex; align-items: center; padding-left: 12px; color: white; font-size: 12px; font-weight: 600; box-shadow: 0 0 10px rgba(250,140,22,0.3);">6项荣誉</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
-                                <p style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6;">
-                                    社区先后获评湖北省综合减灾示范社区、洪山区应急服务站示范站等多项荣誉，基层治理成效显著。
+                    <!-- ===== 三列面板：社区概况 + 今日动态 + 告警信息 ===== -->
+                    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:16px;">
+                        <!-- 左：社区概况 -->
+                        <div class="screen-panel">
+                            <div class="sp-header"><span class="sp-dot" style="background:#00b4ff;"></span>🏘️ 社区概况</div>
+                            <div style="padding:16px 20px;">
+                                <p style="color:rgba(255,255,255,0.7);font-size:13px;line-height:1.8;margin:0;">
+                                    东湖社区隶属武汉市洪山区梨园街道，2009年成立，位于欢乐大道与中北路交汇处，紧邻东湖风景区、徐东商圈，地铁4/8号线岳家嘴站直达。辖区面积<span style="color:#00b4ff;">0.23平方公里</span>，划分<span style="color:#00b4ff;">16个网格</span>，辖8个住宅小区共<span style="color:#00b4ff;">57栋</span>楼栋，常住人口约<span style="color:#00b4ff;">15000人</span>。
                                 </p>
+                                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;">
+                                    <div class="screen-info-item"><div class="sii-val" style="color:#00b4ff;">0.23</div><div class="sii-label">辖区面积(km²)</div></div>
+                                    <div class="screen-info-item"><div class="sii-val" style="color:#52c41a;">57</div><div class="sii-label">楼栋数</div></div>
+                                    <div class="screen-info-item"><div class="sii-val" style="color:#fa8c16;">8</div><div class="sii-label">住宅小区</div></div>
+                                    <div class="screen-info-item"><div class="sii-val" style="color:#8b5cf6;">16</div><div class="sii-label">社区网格</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 中：今日动态 -->
+                        <div class="screen-panel">
+                            <div class="sp-header"><span class="sp-dot" style="background:#52c41a;"></span>📋 今日动态</div>
+                            <div class="screen-feed" id="screen-feed">
+                                <div class="sf-item"><span class="sf-dot-live"></span><span>家政订单 <b style="color:#00b4ff;">JZ20260603001</b> 已派单</span><span class="sf-time">09:32</span></div>
+                                <div class="sf-item"><span class="sf-dot-new"></span><span>食堂午餐 <b>红烧肉+清蒸鱼</b> 开售</span><span class="sf-time">10:00</span></div>
+                                <div class="sf-item"><span class="sf-dot-new"></span><span>物业费 <b style="color:#fa8c16;">3户</b> 刚完成缴费</span><span class="sf-time">10:15</span></div>
+                                <div class="sf-item"><span class="sf-dot-new"></span><span>社区公告 <b>端午节活动</b> 已发布</span><span class="sf-time">10:30</span></div>
+                                <div class="sf-item"><span class="sf-dot-live"></span><span>报修工单 <b style="color:#ff4d4f;">BX20260603008</b> 待派单</span><span class="sf-time">10:42</span></div>
+                            </div>
+                        </div>
+                        <!-- 右：告警信息 -->
+                        <div class="screen-panel">
+                            <div class="sp-header"><span class="sp-dot" style="background:#ff4d4f;"></span>⚠️ 告警信息</div>
+                            <div class="screen-feed" id="screen-alerts">
+                                <div class="sf-item alert"><span>🔴 3栋消防通道占用</span><span class="sf-time">10:20</span></div>
+                                <div class="sf-item warn"><span>🟡 5栋电梯维保到期</span><span class="sf-time">今日</span></div>
+                                <div class="sf-item info2"><span>🟢 系统巡检正常</span><span class="sf-time">09:00</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="background: rgba(10,22,42,0.9); border-radius: 16px; padding: 20px; margin-top: 24px; border: 1px solid rgba(0,212,255,0.15); display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="color: #00d4ff; font-size: 16px;">📍</span>
-                            <span style="color: rgba(255,255,255,0.8); font-size: 14px;">地址：武汉市洪山区欢乐大道46号岳家嘴小区3栋1楼</span>
+                    <!-- ===== 底部两列：荣誉统计 + 配套服务 ===== -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+                        <div class="screen-panel">
+                            <div class="sp-header"><span class="sp-dot" style="background:#fa8c16;"></span>🏆 社区荣誉</div>
+                            <div style="padding:16px 20px;display:flex;gap:16px;align-items:center;">
+                                <div style="flex:1;">
+                                    <div class="honor-bar"><span>省级</span><div class="honor-fill" style="width:60%;background:linear-gradient(90deg,#00b4ff,#13c2c2);">2项</div></div>
+                                    <div class="honor-bar" style="margin-top:10px;"><span>市级</span><div class="honor-fill" style="width:80%;background:linear-gradient(90deg,#52c41a,#389e0d);">4项</div></div>
+                                    <div class="honor-bar" style="margin-top:10px;"><span>区级</span><div class="honor-fill" style="width:100%;background:linear-gradient(90deg,#fa8c16,#d46b08);">6项</div></div>
+                                </div>
+                                <div style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.8;max-width:200px;">
+                                    湖北省综合减灾示范社区<br>洪山区应急服务站示范站<br>武汉市文明社区等
+                                </div>
+                            </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="color: #52c41a; font-size: 16px;">📞</span>
-                            <span style="color: rgba(255,255,255,0.8); font-size: 14px;">联系电话：027-88511880</span>
+                        <div class="screen-panel">
+                            <div class="sp-header"><span class="sp-dot" style="background:#8b5cf6;"></span>🏫 配套服务覆盖率</div>
+                            <div style="padding:16px 20px;display:flex;justify-content:space-around;align-items:flex-end;height:120px;">
+                                <div class="serve-col"><div class="serve-bar" style="height:80px;background:linear-gradient(180deg,#00b4ff,#0d5e8a);">80%</div><span>教育</span></div>
+                                <div class="serve-col"><div class="serve-bar" style="height:100px;background:linear-gradient(180deg,#52c41a,#2d6e0e);">100%</div><span>医疗</span></div>
+                                <div class="serve-col"><div class="serve-bar" style="height:70px;background:linear-gradient(180deg,#fa8c16,#a0520a);">70%</div><span>养老</span></div>
+                                <div class="serve-col"><div class="serve-bar" style="height:90px;background:linear-gradient(180deg,#8b5cf6,#4a1d96);">90%</div><span>文化</span></div>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- ===== 底部信息条 ===== -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,150,255,0.04);border:1px solid rgba(0,180,255,0.1);border-radius:10px;padding:12px 20px;">
+                        <span style="color:rgba(255,255,255,0.6);font-size:13px;">📍 武汉市洪山区欢乐大道46号岳家嘴小区3栋1楼</span>
+                        <span style="color:rgba(255,255,255,0.6);font-size:13px;">📞 027-88511880</span>
+                        <span style="color:rgba(255,255,255,0.4);font-size:12px;">数据更新时间：<span id="screen-update-time">--</span></span>
                     </div>
                 </div>
 
+                <!-- 大屏专属动画样式 -->
                 <style>
-                    @keyframes pulse {
-                        0%, 100% { opacity: 0.5; transform: scale(1); }
-                        50% { opacity: 1; transform: scale(1.1); }
+                    @keyframes screenBlink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+                    @keyframes screenPulse { 0%,100%{opacity:0.6;transform:scale(1);} 50%{opacity:1;transform:scale(1.05);} }
+                    
+                    .screen-stat-card {
+                        background:rgba(0,150,255,0.06);border:1px solid rgba(0,180,255,0.1);
+                        border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;
+                        transition:all 0.3s;cursor:pointer;
                     }
-                    @keyframes blink {
-                        0%, 100% { opacity: 1; }
-                        50% { opacity: 0.3; }
+                    .screen-stat-card::before {
+                        content:'';position:absolute;top:0;left:0;right:0;height:3px;
+                        background:var(--accent);
                     }
+                    .screen-stat-card:hover {
+                        border-color:var(--accent);
+                        box-shadow:0 0 20px color-mix(in srgb,var(--accent) 30%,transparent);
+                        transform:translateY(-2px);
+                    }
+                    .s-stat-top {display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+                    .s-stat-icon {font-size:18px;}
+                    .s-stat-label {color:rgba(255,255,255,0.5);font-size:13px;}
+                    .s-stat-value {font-size:28px;font-weight:700;color:#fff;margin-bottom:4px;}
+                    .s-stat-unit {font-size:13px;color:rgba(255,255,255,0.5);margin-left:4px;}
+                    .s-stat-sub {font-size:12px;color:rgba(255,255,255,0.35);}
+                    
+                    .screen-func-card {
+                        background:var(--bg);border:1px solid var(--border);
+                        border-radius:10px;padding:14px 12px;text-align:center;
+                        cursor:pointer;transition:all 0.3s;
+                    }
+                    .screen-func-card:hover {
+                        transform:translateY(-3px);
+                        box-shadow:0 6px 20px rgba(0,0,0,0.3);
+                        border-color:var(--accent, #00b4ff);
+                    }
+                    .sfc-icon {width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 8px;}
+                    .sfc-name {color:#fff;font-size:14px;font-weight:600;margin-bottom:4px;}
+                    .sfc-desc {color:rgba(255,255,255,0.4);font-size:11px;}
+
+                    .screen-panel {
+                        background:rgba(0,150,255,0.04);border:1px solid rgba(0,180,255,0.08);
+                        border-radius:12px;overflow:hidden;
+                    }
+                    .sp-header {
+                        padding:12px 20px;color:#fff;font-size:14px;font-weight:600;
+                        display:flex;align-items:center;gap:10px;
+                        border-bottom:1px solid rgba(255,255,255,0.06);
+                        background:rgba(0,150,255,0.04);
+                    }
+                    .sp-dot {width:8px;height:8px;border-radius:50%;box-shadow:0 0 6px currentColor;}
+                    
+                    .screen-info-item {text-align:center;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;}
+                    .sii-val {font-size:22px;font-weight:700;}
+                    .sii-label {font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;}
+                    
+                    .screen-feed {padding:12px 16px;}
+                    .sf-item {display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:rgba(255,255,255,0.6);justify-content:space-between;}
+                    .sf-item:last-child {border-bottom:none;}
+                    .sf-dot-live {width:6px;height:6px;border-radius:50%;background:#00b4ff;animation:screenBlink 1.5s infinite;flex-shrink:0;}
+                    .sf-dot-new {width:6px;height:6px;border-radius:50%;background:#52c41a;flex-shrink:0;}
+                    .sf-time {color:rgba(255,255,255,0.3);font-size:11px;flex-shrink:0;}
+                    .sf-item.alert span:first-child {color:#ff4d4f;}
+                    .sf-item.warn span:first-child {color:#fa8c16;}
+                    .sf-item.info2 span:first-child {color:#52c41a;}
+                    
+                    .honor-bar {display:flex;align-items:center;gap:8px;}
+                    .honor-bar > span {color:rgba(255,255,255,0.5);font-size:12px;width:36px;}
+                    .honor-fill {height:26px;border-radius:4px;display:flex;align-items:center;padding-left:12px;color:#fff;font-size:12px;font-weight:600;min-width:40px;}
+                    
+                    .serve-col {display:flex;flex-direction:column;align-items:center;gap:8px;}
+                    .serve-bar {width:44px;border-radius:6px 6px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;color:#fff;font-size:12px;font-weight:600;}
+                    .serve-col > span {color:rgba(255,255,255,0.5);font-size:12px;}
                 </style>
+
                 <script>
                     function updateTime() {
-                        const now = new Date();
-                        const timeStr = now.toLocaleString('zh-CN', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                        const elem = document.getElementById('screen-time');
-                        if (elem) elem.textContent = timeStr;
+                        var now = new Date();
+                        var ts = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+                        var el = document.getElementById('screen-time');
+                        if(el) el.textContent = ts;
+                        var el2 = document.getElementById('screen-update-time');
+                        if(el2) el2.textContent = ts;
                     }
                     updateTime();
                     setInterval(updateTime, 1000);
 
-                    function toggleFullscreen() {
-                        const elem = document.getElementById('page-dashboard-screen');
-                        const btn = document.getElementById('fullscreen-btn');
-                        const icon = document.getElementById('fullscreen-icon');
-                        const text = document.getElementById('fullscreen-text');
-                        
-                        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
-                            if (elem.requestFullscreen) {
-                                elem.requestFullscreen();
-                            } else if (elem.webkitRequestFullscreen) {
-                                elem.webkitRequestFullscreen();
-                            } else if (elem.mozRequestFullScreen) {
-                                elem.mozRequestFullScreen();
-                            } else if (elem.msRequestFullscreen) {
-                                elem.msRequestFullscreen();
+                    (function(){
+                        var evts = ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'];
+                        var doc = document;
+                        function updBtn() {
+                            var i = document.getElementById('fullscreen-icon');
+                            var t = document.getElementById('fullscreen-text');
+                            var b = document.getElementById('fullscreen-btn');
+                            var isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+                            if(i&&t&&b){
+                                if(isFs){ i.textContent='⛶';t.textContent='退出';b.style.background='rgba(82,196,26,0.25)';b.style.borderColor='rgba(82,196,26,0.4)';b.style.color='#52c41a'; }
+                                else { i.textContent='⛶';t.textContent='全屏';b.style.background='rgba(0,180,255,0.15)';b.style.borderColor='rgba(0,180,255,0.4)';b.style.color='#00b4ff'; }
                             }
-                            icon.textContent = '⛶';
-                            text.textContent = '退出全屏';
-                            btn.style.background = 'linear-gradient(135deg, rgba(82,196,26,0.3) 0%, rgba(56,158,13,0.2) 100%)';
-                            btn.style.borderColor = 'rgba(82,196,26,0.4)';
-                            btn.style.color = '#52c41a';
-                        } else {
-                            if (document.exitFullscreen) {
-                                document.exitFullscreen();
-                            } else if (document.webkitExitFullscreen) {
-                                document.webkitExitFullscreen();
-                            } else if (document.mozCancelFullScreen) {
-                                document.mozCancelFullScreen();
-                            } else if (document.msExitFullscreen) {
-                                document.msExitFullscreen();
+                        }
+                        evts.forEach(function(e){ doc.addEventListener(e,updBtn); });
+                        window.toggleFullscreen = function(){
+                            var el = document.getElementById('page-dashboard-screen');
+                            var isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+                            if(!isFs){
+                                if(el.requestFullscreen) el.requestFullscreen();
+                                else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                                else if(el.mozRequestFullScreen) el.mozRequestFullScreen();
+                                else if(el.msRequestFullscreen) el.msRequestFullscreen();
+                            } else {
+                                if(doc.exitFullscreen) doc.exitFullscreen();
+                                else if(doc.webkitExitFullscreen) doc.webkitExitFullscreen();
+                                else if(doc.mozCancelFullScreen) doc.mozCancelFullScreen();
+                                else if(doc.msExitFullscreen) doc.msExitFullscreen();
                             }
-                            icon.textContent = '⛶';
-                            text.textContent = '全屏';
-                            btn.style.background = 'linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%)';
-                            btn.style.borderColor = 'rgba(0,212,255,0.4)';
-                            btn.style.color = '#00d4ff';
-                        }
-                    }
-
-                    document.addEventListener('fullscreenchange', updateFullscreenBtn);
-                    document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
-                    document.addEventListener('mozfullscreenchange', updateFullscreenBtn);
-                    document.addEventListener('MSFullscreenChange', updateFullscreenBtn);
-
-                    function updateFullscreenBtn() {
-                        const icon = document.getElementById('fullscreen-icon');
-                        const text = document.getElementById('fullscreen-text');
-                        const btn = document.getElementById('fullscreen-btn');
-                        
-                        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-                            icon.textContent = '⛶';
-                            text.textContent = '退出全屏';
-                            btn.style.background = 'linear-gradient(135deg, rgba(82,196,26,0.3) 0%, rgba(56,158,13,0.2) 100%)';
-                            btn.style.borderColor = 'rgba(82,196,26,0.4)';
-                            btn.style.color = '#52c41a';
-                        } else {
-                            icon.textContent = '⛶';
-                            text.textContent = '全屏';
-                            btn.style.background = 'linear-gradient(135deg, rgba(0,212,255,0.3) 0%, rgba(19,194,194,0.2) 100%)';
-                            btn.style.borderColor = 'rgba(0,212,255,0.4)';
-                            btn.style.color = '#00d4ff';
-                        }
-                    }
+                        };
+                    })();
                 </script>
             </div>
 
