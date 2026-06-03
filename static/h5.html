@@ -1233,11 +1233,11 @@
                 // 公告 → 系统消息/活动通知
                 if (annRes && annRes.code === 0 && annRes.data) {
                     annRes.data.slice(0, 5).forEach(a => {
-                        const t = a.type === 'activity' ? 'activity' : a.type === 'urgent' ? 'system' : 'fee';
+                        const t = a.is_urgent ? 'system' : a.category === 'activity' ? 'activity' : 'fee';
                         msgs.push({
                             type: t,
-                            icon: t === 'activity' ? '🎉' : t === 'urgent' ? '🔔' : '📢',
-                            bg: t === 'activity' ? 'linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%)' : 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
+                            icon: t === 'system' ? '🔔' : t === 'activity' ? '🎉' : '📢',
+                            bg: t === 'system' ? 'linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%)' : t === 'activity' ? 'linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%)' : 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
                             title: a.title,
                             desc: (a.content || '').substring(0, 60),
                             time: a.published_at || a.created_at || '',
