@@ -2767,14 +2767,11 @@
                 status: document.getElementById('cm-status').value
             };
             if (!data.menu_date || !data.dishes) { showToast('请填写日期和菜品', 'error'); return; }
-            if (editId && editId !== 'null') {
-                // Edit existing - we use POST for simplicity (mock replaces based on date+meal)
-                const res = await api('/api/canteen/menus', { method: 'POST', body: JSON.stringify(data) });
-                if (res.code === 0) { showToast('修改成功', 'success'); closeModal(); loadCanteenMenusAdmin(); }
-            } else {
-                const res = await api('/api/canteen/menus', { method: 'POST', body: JSON.stringify(data) });
-                if (res.code === 0) { showToast('添加成功', 'success'); closeModal(); loadCanteenMenusAdmin(); }
-            }
+            var isEdit = editId && editId !== 'null';
+            var url = isEdit ? '/api/canteen/menus/' + editId : '/api/canteen/menus';
+            var method = isEdit ? 'PUT' : 'POST';
+            const res = await api(url, { method: method, body: JSON.stringify(data) });
+            if (res.code === 0) { showToast(isEdit ? '修改成功' : '添加成功', 'success'); closeModal(); loadCanteenMenusAdmin(); }
         }
         function editCanteenMenu(id) {
             api('/api/canteen/menus').then(res => {
@@ -2887,9 +2884,11 @@
                 sort: parseInt(document.getElementById('cg-sort').value) || 10
             };
             if (!data.title) { showToast('请填写标题', 'error'); return; }
-            // For gallery we use a simple POST to add new items
-            const res = await api('/api/canteen/gallery', { method: 'POST', body: JSON.stringify(data) });
-            if (res.code === 0) { showToast(editId && editId !== 'null' ? '修改成功' : '添加成功', 'success'); closeModal(); loadCanteenGalleryAdmin(); }
+            var isEdit = editId && editId !== 'null';
+            var url = isEdit ? '/api/canteen/gallery/' + editId : '/api/canteen/gallery';
+            var method = isEdit ? 'PUT' : 'POST';
+            const res = await api(url, { method: method, body: JSON.stringify(data) });
+            if (res.code === 0) { showToast(isEdit ? '修改成功' : '添加成功', 'success'); closeModal(); loadCanteenGalleryAdmin(); }
         }
         function editCanteenGallery(id) {
             api('/api/canteen/gallery').then(res => {
