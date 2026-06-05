@@ -332,6 +332,28 @@
             background: var(--color-white); color: var(--color-primary);
             box-shadow: var(--shadow-xs);
         }
+        /* --- 食堂二级菜单 --- */
+        .canteen-submenu {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;
+        }
+        .canteen-sub-card {
+            background: var(--color-white); border-radius: var(--radius-lg);
+            padding: 16px 14px; text-align: center; cursor: pointer;
+            box-shadow: var(--shadow-xs); transition: all 0.15s;
+        }
+        .canteen-sub-card:active { transform: scale(0.97); box-shadow: var(--shadow-sm); }
+        .canteen-sub-icon {
+            font-size: 28px; margin-bottom: 8px;
+        }
+        .canteen-sub-name {
+            font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px;
+        }
+        .canteen-sub-desc {
+            font-size: 11px; color: var(--color-text-tertiary);
+        }
+        .canteen-sub-card:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+        }
         .week-selector {
             display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto;
             padding-bottom: 8px;
@@ -1874,15 +1896,12 @@
             if (!list) return;
             const categories = [
                 { key:'housekeeping', icon:'🧹', color:'#e6f7ff', label:'家政服务', desc:'日常保洁、大扫除、照顾老人/小孩' },
-                { key:'canteen', icon:'🍽️', color:'#fff7e6', label:'社区食堂', desc:'营养套餐、送餐上门' },
+                { key:'canteen', icon:'🍽️', color:'#fff7e6', label:'社区食堂', desc:'订餐·包房·套餐·外卖' },
                 { key:'repair', icon:'🔧', color:'#f0f5ff', label:'报修服务', desc:'水电维修、家电维修、管道疏通' },
                 { key:'property', icon:'🏦', color:'#f6ffed', label:'物业缴费', desc:'物业费、水电费在线缴纳' },
                 { key:'visitor', icon:'📨', color:'#fff0f6', label:'访客管理', desc:'访客邀请、临时门禁授权' },
                 { key:'parking', icon:'🅿️', color:'#e6fffb', label:'车位服务', desc:'车位预约、停车缴费' },
                 { key:'health', icon:'❤️', color:'#fff1f0', label:'健康服务', desc:'送药上门、陪诊、康复训练' },
-                { key:'room', icon:'🏠', color:'#f0f5ff', label:'包房预订', desc:'包间预订、商务宴请、家庭聚餐' },
-                { key:'mealset', icon:'🍱', color:'#fffbe6', label:'套餐预订', desc:'15-40元多档位套餐' },
-                { key:'takeout', icon:'🛵', color:'#f6ffed', label:'外卖送餐', desc:'在线点餐、配送到家' },
             ];
             list.innerHTML = categories.map(c => `
                 <div class="service-category-card" onclick="loadServiceContent('${c.key}')">
@@ -1934,31 +1953,47 @@
                     '<button class="submit-btn" onclick="submitHousekeeping()">提交预约</button>' +
                     '</div>';
             } else if (type === 'canteen') {
-                html = '<div class="canteen-tabs">' +
-                    '<div class="canteen-tab active" onclick="switchCanteenTab(this,\'order\')">🍽️ 订餐</div>' +
-                    '<div class="canteen-tab" onclick="switchCanteenTab(this,\'menu\')">📋 本周菜谱</div>' +
+                html = '<div class="form-card" style="margin-bottom:12px;">' +
+                    '<div class="form-title">🍽️ 社区食堂服务</div>' +
                     '</div>' +
-                    '<div class="form-card" id="canteenOrderForm">' +
+                    '<div class="canteen-submenu">' +
+                    '<div class="canteen-sub-card" onclick="showCanteenOrder()">' +
+                    '<div class="canteen-sub-icon">🍽️</div>' +
+                    '<div class="canteen-sub-name">在线订餐</div>' +
+                    '<div class="canteen-sub-desc">堂食/打包</div></div>' +
+                    '<div class="canteen-sub-card" onclick="showCanteenMenu()">' +
+                    '<div class="canteen-sub-icon">📋</div>' +
+                    '<div class="canteen-sub-name">本周菜谱</div>' +
+                    '<div class="canteen-sub-desc">查看每日菜谱</div></div>' +
+                    '<div class="canteen-sub-card" onclick="loadServiceContent(\'room\')">' +
+                    '<div class="canteen-sub-icon">🏠</div>' +
+                    '<div class="canteen-sub-name">包房预订</div>' +
+                    '<div class="canteen-sub-desc">商务宴请·家庭聚餐</div></div>' +
+                    '<div class="canteen-sub-card" onclick="loadServiceContent(\'mealset\')">' +
+                    '<div class="canteen-sub-icon">🍱</div>' +
+                    '<div class="canteen-sub-name">套餐预订</div>' +
+                    '<div class="canteen-sub-desc">15-40元多档位</div></div>' +
+                    '<div class="canteen-sub-card" onclick="loadServiceContent(\'takeout\')">' +
+                    '<div class="canteen-sub-icon">🛵</div>' +
+                    '<div class="canteen-sub-name">外卖送餐</div>' +
+                    '<div class="canteen-sub-desc">配送到家</div></div>' +
+                    '</div>' +
+                    '<div id="canteenOrderForm" style="display:none;">' +
+                    '<div class="form-card">' +
                     '<div class="form-title">社区食堂订餐</div>' +
                     '<div class="form-row"><label class="form-label">用餐类型</label>' +
-                    '<select class="form-select" id="ctType">' +
-                    '<option value="堂食">堂食</option>' +
-                    '<option value="打包">打包</option>' +
-                    '</select></div>' +
+                    '<select class="form-select" id="ctType"><option value="堂食">堂食</option><option value="打包">打包</option></select></div>' +
                     '<div class="form-row"><label class="form-label">用餐时间</label>' +
                     '<input type="datetime-local" class="form-input" id="ctTime"></div>' +
                     '<div class="form-row"><label class="form-label">人数</label>' +
                     '<input type="number" class="form-input" id="ctPeople" value="1" min="1"></div>' +
                     '<button class="submit-btn" onclick="submitCanteen()">提交订单</button>' +
-                    '</div>' +
+                    '</div></div>' +
                     '<div id="canteenMenuView" style="display:none;">' +
-                    '<div class="form-card">' +
-                    '<div class="form-title">📋 本周菜谱</div>' +
+                    '<div class="form-card"><div class="form-title">📋 本周菜谱</div>' +
                     '<div class="week-selector" id="weekSelector"></div>' +
                     '<div class="meal-tabs" id="mealTabs"></div>' +
-                    '<div class="menu-list" id="menuList"></div>' +
-                    '</div>' +
-                    '</div>';
+                    '<div class="menu-list" id="menuList"></div></div></div>';
             } else if (type === 'repair') {
                 html = '<div class="form-card">' +
                     '<div class="form-title">🔧 报修申请</div>' +
@@ -2155,6 +2190,33 @@
                 loadWeekSelector();
                 loadMealTabs();
             }
+        }
+
+        function showCanteenOrder() {
+            document.querySelectorAll('.canteen-submenu').forEach(el => el.style.display = 'none');
+            var form = document.getElementById('canteenOrderForm');
+            if (form) form.style.display = '';
+            document.getElementById('canteenMenuView').style.display = 'none';
+            var backBtn = document.querySelector('#page-service .header-back');
+            if (backBtn) backBtn.onclick = createCanteenBack();
+        }
+        function showCanteenMenu() {
+            document.querySelectorAll('.canteen-submenu').forEach(el => el.style.display = 'none');
+            document.getElementById('canteenOrderForm').style.display = 'none';
+            document.getElementById('canteenMenuView').style.display = '';
+            loadWeekSelector();
+            loadMealTabs();
+            var backBtn = document.querySelector('#page-service .header-back');
+            if (backBtn) backBtn.onclick = createCanteenBack();
+        }
+        function createCanteenBack() {
+            return function() {
+                document.querySelectorAll('.canteen-submenu').forEach(el => el.style.display = '');
+                document.getElementById('canteenOrderForm').style.display = 'none';
+                document.getElementById('canteenMenuView').style.display = 'none';
+                var backBtn = document.querySelector('#page-service .header-back');
+                if (backBtn) backBtn.onclick = showServiceCategories;
+            };
         }
 
         function loadWeekSelector() {
