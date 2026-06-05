@@ -856,8 +856,7 @@ def init_mock_data(conn):
         for t in tiers:
             cursor.execute('INSERT INTO canteen_meal_sets (tier_name, tier_label, price, description, sort) VALUES (?,?,?,?,?)', t)
         # 本周菜单
-        from datetime import date, timedelta
-        today = date.today()
+        today = datetime.now().date()
         week_start = (today - timedelta(days=today.weekday())).strftime('%Y-%m-%d')
         week_end = (today + timedelta(days=6-today.weekday())).strftime('%Y-%m-%d')
         menus = [
@@ -2873,8 +2872,7 @@ def update_meal_set(set_id):
     conn.commit()
     # 更新本周菜单
     if data.get('dishes'):
-        from datetime import date, timedelta
-        today = date.today()
+        today = datetime.now().date()
         ws = (today - timedelta(days=today.weekday())).strftime('%Y-%m-%d')
         we = (today + timedelta(days=6-today.weekday())).strftime('%Y-%m-%d')
         cursor.execute("DELETE FROM meal_set_menus WHERE tier_id=? AND week_start=? AND week_end=?", (set_id, ws, we))
