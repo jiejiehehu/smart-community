@@ -1188,7 +1188,7 @@
             if (param) {
                 const title = document.getElementById('serviceTitle');
                 if (title) {
-                    const names = { housekeeping:'家政服务', canteen:'社区食堂', property:'物业缴费', repair:'报修服务', visitor:'访客管理', parking:'车位服务', health:'健康服务', more:'更多服务' };
+                    const names = { housekeeping:'家政服务', canteen:'社区食堂', property:'物业缴费', repair:'报修服务', visitor:'访客管理', parking:'车位服务', health:'健康服务', more:'更多服务', room:'包房预订', mealset:'套餐预订', takeout:'外卖送餐' };
                     title.textContent = '📋 ' + (names[param] || '服务预约');
                 }
             }
@@ -2096,6 +2096,9 @@
                     {key:'visitor',icon:'📨',color:'#fff0f6',label:'访客管理'},
                     {key:'parking',icon:'🅿️',color:'#e6fffb',label:'车位服务'},
                     {key:'health',icon:'❤️',color:'#fff1f0',label:'健康服务'},
+                    {key:'room',icon:'🏠',color:'#f0f5ff',label:'包房预订'},
+                    {key:'mealset',icon:'🍱',color:'#fffbe6',label:'套餐预订'},
+                    {key:'takeout',icon:'🛵',color:'#f6ffed',label:'外卖送餐'},
                     {key:'more',icon:'🎉',color:'#f5f5f5',label:'社区活动'}
                 ];
                 html = '<div class="form-card"><div class="form-title">📋 全部服务</div></div>' +
