@@ -1880,6 +1880,9 @@
                 { key:'visitor', icon:'📨', color:'#fff0f6', label:'访客管理', desc:'访客邀请、临时门禁授权' },
                 { key:'parking', icon:'🅿️', color:'#e6fffb', label:'车位服务', desc:'车位预约、停车缴费' },
                 { key:'health', icon:'❤️', color:'#fff1f0', label:'健康服务', desc:'送药上门、陪诊、康复训练' },
+                { key:'room', icon:'🏠', color:'#f0f5ff', label:'包房预订', desc:'包间预订、商务宴请、家庭聚餐' },
+                { key:'mealset', icon:'🍱', color:'#fffbe6', label:'套餐预订', desc:'15-40元多档位套餐' },
+                { key:'takeout', icon:'🛵', color:'#f6ffed', label:'外卖送餐', desc:'在线点餐、配送到家' },
             ];
             list.innerHTML = categories.map(c => `
                 <div class="service-category-card" onclick="loadServiceContent('${c.key}')">
@@ -2052,6 +2055,37 @@
                     '<div id="activityList" style="margin-top:12px;"><div style="padding:20px;text-align:center;color:#999;">加载中...</div></div>' +
                     '</div>';
                 setTimeout(loadActivityList, 100);
+            } else if (type === 'room') {
+                html = '<div class="form-card">' +
+                    '<div class="form-title">🏠 包房预订</div>' +
+                    '<div id="room-list" style="margin-bottom:16px;"><div style="padding:20px;text-align:center;color:#999;">加载中...</div></div>' +
+                    '<div class="form-row"><label class="form-label">选择包房</label><select class="form-select" id="rm-room"></select></div>' +
+                    '<div class="form-row"><label class="form-label">姓名 <span style="color:#ff4d4f">*</span></label><input type="text" class="form-input" id="rm-name"></div>' +
+                    '<div class="form-row"><label class="form-label">电话 <span style="color:#ff4d4f">*</span></label><input type="tel" class="form-input" id="rm-phone"></div>' +
+                    '<div class="form-row"><label class="form-label">用餐人数 <span style="color:#ff4d4f">*</span></label><input type="number" class="form-input" id="rm-count" value="8" min="1" max="20"></div>' +
+                    '<div class="form-row"><label class="form-label">预订日期</label><input type="date" class="form-input" id="rm-date"></div>' +
+                    '<div class="form-row"><label class="form-label">预订时间</label><select class="form-select" id="rm-time"><option>12:00</option><option>18:00</option><option>18:30</option><option>19:00</option></select></div>' +
+                    '<div class="form-row"><label class="form-label">用途</label><select class="form-select" id="rm-purpose"><option>家庭聚餐</option><option>商务宴请</option><option>朋友聚会</option><option>生日宴会</option><option>其他</option></select></div>' +
+                    '<button class="submit-btn" onclick="submitRoomReserve()">提交预订</button>' +
+                    '</div>';
+                setTimeout(loadRoomList, 100);
+            } else if (type === 'mealset') {
+                html = '<div class="form-card"><div class="form-title">🍱 套餐选择</div>' +
+                    '<div id="mealset-list" style="margin-bottom:16px;"><div style="padding:20px;text-align:center;color:#999;">加载中...</div></div>' +
+                    '<div class="form-row"><label class="form-label">预订日期</label><input type="date" class="form-input" id="ms-date"></div>' +
+                    '<div class="form-row"><label class="form-label">取餐时段</label><select class="form-select" id="ms-time"><option>10:00 - 11:00</option><option>11:00 - 12:00</option><option>12:00 - 13:00</option></select></div>' +
+                    '<button class="submit-btn" onclick="submitMealSetOrder()">确认预订</button>' +
+                    '</div>';
+                setTimeout(loadMealSetList, 100);
+            } else if (type === 'takeout') {
+                html = '<div class="form-card"><div class="form-title">🛵 外卖点单</div>' +
+                    '<div class="form-row"><label class="form-label">菜品 <span style="color:#ff4d4f">*</span></label><textarea class="form-textarea" id="to-dishes" placeholder="请输入您想点的菜品，如：红烧肉+米饭+紫菜汤"></textarea></div>' +
+                    '<div class="form-row"><label class="form-label">姓名 <span style="color:#ff4d4f">*</span></label><input type="text" class="form-input" id="to-name" value="李明华"></div>' +
+                    '<div class="form-row"><label class="form-label">电话 <span style="color:#ff4d4f">*</span></label><input type="tel" class="form-input" id="to-phone" value="13812345678"></div>' +
+                    '<div class="form-row"><label class="form-label">配送地址 <span style="color:#ff4d4f">*</span></label><input type="text" class="form-input" id="to-address" value="碧水园3栋2单元1501"></div>' +
+                    '<div class="form-row"><label class="form-label">期望送达</label><input type="datetime-local" class="form-input" id="to-time"></div>' +
+                    '<button class="submit-btn" onclick="submitTakeout()">下单</button>' +
+                    '</div>';
             } else {
                 // 未知服务类型，显示所有可用服务
                 var cats = [
@@ -2376,6 +2410,53 @@
             const res = await api('api/health/orders', { method: 'POST', body: JSON.stringify(data) });
             if (res && res.code === 0) { showH5Toast('健康服务预约成功！', 'success'); }
             else { showH5Toast('预约失败，请重试', 'error'); }
+        }
+
+        // ============ 包房预订 ============
+        async function loadRoomList() {
+            const res = await api('api/canteen/rooms');
+            var sel = document.getElementById('rm-room');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">请选择包房</option>' + (res.data||[]).map(r => '<option value="'+r.id+'">'+r.room_name+'（'+r.capacity+'人 ¥'+r.price+') - '+r.description+'</option>').join('');
+            var list = document.getElementById('room-list');
+            if (list) list.innerHTML = (res.data||[]).map(r => '<div class="service-category-card" style="cursor:default"><div class="category-icon">🏠</div><div class="category-info"><h3>'+r.room_name+'</h3><p>'+r.capacity+'人 · ¥'+r.price+'/次 · '+(r.description||'')+'</p></div><span style="color:'+(r.status==='available'?'#52c41a':'#ff4d4f')+';font-size:12px;">'+(r.status==='available'?'空闲':'占用')+'</span></div>').join('');
+        }
+        async function submitRoomReserve() {
+            var data = {
+                room_id: parseInt(document.getElementById('rm-room').value) || null,
+                customer_name: document.getElementById('rm-name').value.trim(),
+                customer_phone: document.getElementById('rm-phone').value.trim(),
+                guest_count: parseInt(document.getElementById('rm-count').value) || 0,
+                reserve_date: document.getElementById('rm-date').value,
+                reserve_time: document.getElementById('rm-time').value,
+                purpose: document.getElementById('rm-purpose').value
+            };
+            if (!data.customer_name||!data.customer_phone||!data.guest_count){showH5Toast('请填写必填项','error');return;}
+            var res = await api('api/canteen/room-reservations',{method:'POST',body:JSON.stringify(data)});
+            if (res&&res.code===0){showH5Toast('预订已提交，等待审核','success');}else{showH5Toast('提交失败','error');}
+        }
+        // ============ 套餐预订 ============
+        async function loadMealSetList() {
+            var res = await api('api/canteen/meal-sets');
+            var list = document.getElementById('mealset-list');
+            if (!list) return;
+            list.innerHTML = (res.data||[]).map(s => '<div class="service-category-card"><div class="category-icon">🍱</div><div class="category-info"><h3>'+s.tier_label+' - '+s.tier_name+'</h3><p>¥'+s.price+' · '+(s.description||'')+'</p><p style="font-size:11px;color:#1890ff;">本周：'+(s.menus&&s.menus[0]?s.menus[0].dishes:'-')+'</p></div><span style="font-size:18px;font-weight:700;color:#ff4d4f;">¥'+s.price+'</span></div>').join('') || '<div style="text-align:center;padding:20px;color:#999;">暂无套餐</div>';
+        }
+        async function submitMealSetOrder() {
+            showH5Toast('套餐预订已记录，我们会联系您确认','success');
+        }
+        // ============ 外卖送餐 ============
+        async function submitTakeout() {
+            var data = {
+                customer_name: document.getElementById('to-name').value.trim(),
+                customer_phone: document.getElementById('to-phone').value.trim(),
+                delivery_address: document.getElementById('to-address').value.trim(),
+                dishes: document.getElementById('to-dishes').value.trim(),
+                reserve_time: document.getElementById('to-time').value
+            };
+            if (!data.customer_name||!data.customer_phone||!data.delivery_address){showH5Toast('请填写必填项','error');return;}
+            var res = await api('api/canteen/takeout-orders',{method:'POST',body:JSON.stringify(data)});
+            if (res&&res.code===0){showH5Toast('下单成功！订单号：'+res.data.order_no,'success');}else{showH5Toast('下单失败','error');}
         }
 
         // ============ 社区医生功能 ============

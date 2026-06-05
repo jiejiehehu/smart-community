@@ -957,6 +957,9 @@
                     <div class="submenu-item" data-page="canteen-ingredients" onclick="showPage('canteen-ingredients')">· 食材库存</div>
                     <div class="submenu-item" data-page="canteen-menus" onclick="showPage('canteen-menus')">· 每日菜谱</div>
                     <div class="submenu-item" data-page="canteen-gallery" onclick="showPage('canteen-gallery')">· 食堂风采</div>
+                    <div class="submenu-item" data-page="canteen-rooms" onclick="showPage('canteen-rooms')">🏠 包房管理</div>
+                    <div class="submenu-item" data-page="canteen-mealsets" onclick="showPage('canteen-mealsets')">📦 套餐管理</div>
+                    <div class="submenu-item" data-page="canteen-takeout" onclick="showPage('canteen-takeout')">🛵 外卖管理</div>
                 </div>
                 
                 <div class="menu-item has-submenu" onclick="toggleSubmenu(this)" data-module="property">
@@ -1656,6 +1659,40 @@
                     <table class="data-table">
                         <thead><tr><th>排序</th><th>标题</th><th>描述</th><th>图标</th><th>背景色</th><th>操作</th></tr></thead>
                         <tbody id="canteen-gallery-tbody"><tr><td colspan="6" class="loading">加载中</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- ========== 食堂 - 包房管理 ========== -->
+            <div id="page-canteen-rooms" class="page-content">
+                <div class="overview-section">
+                    <h2 class="section-title">包房库存</h2>
+                    <div class="overview-cards" id="rooms-cards"><div style="text-align:center;color:#999;padding:20px;">加载中...</div></div>
+                </div>
+                <div class="table-section">
+                    <div class="table-header"><span class="table-title">📋 包房预订列表</span></div>
+                    <table class="data-table">
+                        <thead><tr><th>包房</th><th>客户</th><th>电话</th><th>人数</th><th>日期</th><th>时间</th><th>用途</th><th>状态</th><th>操作</th></tr></thead>
+                        <tbody id="room-reservations-tbody"><tr><td colspan="9" class="loading">加载中</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- ========== 食堂 - 套餐管理 ========== -->
+            <div id="page-canteen-mealsets" class="page-content">
+                <div class="table-section">
+                    <div class="table-header"><span class="table-title">📦 套餐档位管理</span><div class="table-actions"><button class="btn btn-primary btn-sm" onclick="openMealSetModal()">+ 新增档位</button></div></div>
+                    <table class="data-table">
+                        <thead><tr><th>档位</th><th>价格</th><th>说明</th><th>排序</th><th>本周菜单</th><th>操作</th></tr></thead>
+                        <tbody id="meal-sets-tbody"><tr><td colspan="6" class="loading">加载中</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- ========== 食堂 - 外卖管理 ========== -->
+            <div id="page-canteen-takeout" class="page-content">
+                <div class="table-section">
+                    <div class="table-header"><span class="table-title">🛵 外卖订单管理</span></div>
+                    <table class="data-table">
+                        <thead><tr><th>订单号</th><th>客户</th><th>电话</th><th>地址</th><th>菜品</th><th>金额</th><th>日期</th><th>状态</th><th>操作</th></tr></thead>
+                        <tbody id="takeout-orders-tbody"><tr><td colspan="9" class="loading">加载中</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -2491,6 +2528,9 @@
                 case 'canteen-ingredients': loadIngredients(); break;
                 case 'canteen-menus': loadCanteenMenusAdmin(); break;
                 case 'canteen-gallery': loadCanteenGalleryAdmin(); break;
+                case 'canteen-rooms': loadCanteenRooms(); break;
+                case 'canteen-mealsets': loadMealSets(); break;
+                case 'canteen-takeout': loadTakeoutOrders(); break;
                 case 'property-home': loadPropertyFees(); loadPropertyStats(); break;
                 case 'property-fees': loadPropertyFeesAll(); break;
                 case 'property-records': loadPropertyRecords(); break;
@@ -2902,6 +2942,67 @@
             const res = await api(`/api/canteen/gallery/${id}`, { method: 'DELETE' });
             if (res.code === 0) { showToast('删除成功', 'success'); loadCanteenGalleryAdmin(); }
         }
+        
+        // ========== 包房管理 ==========
+        async function loadCanteenRooms() {
+            const [roomsRes, resvRes] = await Promise.all([
+                api('/api/canteen/rooms'),
+                api('/api/canteen/room-reservations')
+            ]);
+            // 包房库存卡片
+            var roomsHtml = '';
+            (roomsRes.data||[]).forEach(r => {
+                var todayRes = (resvRes.data||[]).filter(rv => rv.room_id === r.id && rv.status === 'confirmed' && rv.reserve_date === new Date().toISOString().slice(0,10));
+                roomsHtml += '<div class="overview-card"><div class="overview-icon blue">🏠</div><div class="overview-info"><h3>' + r.room_name + '</h3><p>' + r.capacity + '人 · ¥' + r.price + '/次 · ' + (r.status==='available'?'<span style="color:#52c41a">空闲</span>':'<span style="color:#ff4d4f">已占用</span>') + '</p><p style="font-size:11px;color:#999;">' + (r.description||'') + '</p></div></div>';
+            });
+            document.getElementById('rooms-cards').innerHTML = roomsHtml || '<div style="text-align:center;color:#999;padding:20px;">暂无可预订包房</div>';
+            // 预订列表
+            var statusMap = {pending:'待确认', confirmed:'已确认', cancelled:'已取消'};
+            var colorMap = {pending:'#fa8c16', confirmed:'#52c41a', cancelled:'#999'};
+            document.getElementById('room-reservations-tbody').innerHTML = (resvRes.data||[]).map(rv => '<tr><td>'+(rv.room_name||'包房#'+rv.room_id)+'</td><td>'+rv.customer_name+'</td><td>'+rv.customer_phone+'</td><td>'+rv.guest_count+'人</td><td>'+rv.reserve_date+'</td><td>'+(rv.reserve_time||'-')+'</td><td>'+(rv.purpose||'-')+'</td><td><span style="color:'+(colorMap[rv.status]||'#666')+';font-weight:600;">'+(statusMap[rv.status]||rv.status)+'</span></td><td>'+(rv.status==='pending'?'<button class="btn btn-success btn-sm" onclick="confirmRoomRes('+rv.id+')">确认</button> <button class="btn btn-danger btn-sm" onclick="cancelRoomRes('+rv.id+')">取消</button>':'-')+'</td></tr>').join('') || '<tr><td colspan="9" style="text-align:center;color:#999;">暂无预订</td></tr>';
+        }
+        async function confirmRoomRes(id) { await api('/api/canteen/room-reservations/'+id+'/confirm',{method:'PUT',body:JSON.stringify({admin_remark:'已电话确认'})}); showToast('已确认','success'); loadCanteenRooms(); }
+        async function cancelRoomRes(id) { await api('/api/canteen/room-reservations/'+id+'/cancel',{method:'PUT'}); showToast('已取消','success'); loadCanteenRooms(); }
+        
+        // ========== 套餐管理 ==========
+        async function loadMealSets() {
+            const res = await api('/api/canteen/meal-sets');
+            document.getElementById('meal-sets-tbody').innerHTML = (res.data||[]).map(s => '<tr><td><b>'+s.tier_label+'</b><br><span style="font-size:11px;color:#999;">'+s.tier_name+'</span></td><td>¥'+s.price+'</td><td>'+(s.description||'')+'</td><td>'+s.sort+'</td><td style="max-width:200px;font-size:12px;">'+(s.menus&&s.menus[0]?s.menus[0].dishes:'-')+'</td><td><button class="btn btn-outline btn-sm" onclick="editMealSet('+s.id+')">编辑</button> <button class="btn btn-danger btn-sm" onclick="deleteMealSet('+s.id+')">下架</button></td></tr>').join('') || '<tr><td colspan="6" style="text-align:center;color:#999;">暂无档位</td></tr>';
+        }
+        function openMealSetModal() {
+            showModal('新增套餐档位', '<div class="form-group" style="margin-bottom:12px"><label>档位标签</label><input class="form-input" id="ms-label" placeholder="如：15元档"></div><div class="form-group" style="margin-bottom:12px"><label>档次名称</label><input class="form-input" id="ms-name" placeholder="如：经济型"></div><div class="form-group" style="margin-bottom:12px"><label>价格</label><input class="form-input" id="ms-price" type="number"></div><div class="form-group" style="margin-bottom:12px"><label>说明</label><input class="form-input" id="ms-desc" placeholder="如：一荤一素+米饭"></div><div class="form-group"><label>排序</label><input class="form-input" id="ms-sort" type="number" value="10"></div>', '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitMealSet()">确定</button>');
+        }
+        async function submitMealSet() {
+            const res = await api('/api/canteen/meal-sets',{method:'POST',body:JSON.stringify({tier_label:document.getElementById('ms-label').value,tier_name:document.getElementById('ms-name').value,price:parseFloat(document.getElementById('ms-price').value),description:document.getElementById('ms-desc').value,sort:parseInt(document.getElementById('ms-sort').value)})});
+            if(res.code===0){showToast('添加成功','success');closeModal();loadMealSets();}
+        }
+        var currentEditMsId = null;
+        function editMealSet(id) {
+            api('/api/canteen/meal-sets').then(res => {
+                var s = (res.data||[]).find(x=>x.id===id);
+                if(!s) return;
+                currentEditMsId = id;
+                var curDishes = s.menus&&s.menus[0]?s.menus[0].dishes:'';
+                showModal('编辑套餐 '+s.tier_label, '<div class="form-group" style="margin-bottom:12px"><label>本周菜品</label><input class="form-input" id="ms-dishes" value="'+curDishes+'" placeholder="如：红烧肉+青菜+米饭"></div><div class="form-group"><label>价格</label><input class="form-input" id="ms-price" type="number" value="'+s.price+'"></div>', '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitEditMealSet()">保存</button>');
+            });
+        }
+        async function submitEditMealSet() {
+            const res = await api('/api/canteen/meal-sets/'+currentEditMsId,{method:'PUT',body:JSON.stringify({price:parseFloat(document.getElementById('ms-price').value),dishes:document.getElementById('ms-dishes').value})});
+            if(res.code===0){showToast('更新成功','success');closeModal();loadMealSets();}
+        }
+        async function deleteMealSet(id) { if(!confirm('确定下架？'))return; await api('/api/canteen/meal-sets/'+id,{method:'DELETE'}); showToast('已下架','success'); loadMealSets(); }
+        
+        // ========== 外卖管理 ==========
+        async function loadTakeoutOrders() {
+            const res = await api('/api/canteen/takeout-orders');
+            var statusMap = {pending:'待接单', accepted:'已接单', delivering:'配送中', completed:'已完成'};
+            var colorMap = {pending:'#fa8c16', accepted:'#1890ff', delivering:'#8b5cf6', completed:'#52c41a'};
+            document.getElementById('takeout-orders-tbody').innerHTML = (res.data||[]).map(o => '<tr><td>'+o.order_no+'</td><td>'+o.customer_name+'</td><td>'+o.customer_phone+'</td><td>'+(o.delivery_address||'')+'</td><td style="max-width:150px;font-size:12px;">'+(o.dishes||'-')+'</td><td>¥'+(o.amount||0)+'</td><td>'+(o.reserve_date||'-')+'</td><td><span style="color:'+(colorMap[o.status]||'#666')+';font-weight:600;">'+(statusMap[o.status]||o.status)+'</span></td><td>'+(o.status==='pending'?'<button class="btn btn-primary btn-sm" onclick="acceptTakeout('+o.id+')">接单</button>':o.status==='accepted'?'<button class="btn btn-success btn-sm" onclick="deliverTakeout('+o.id+')">配送</button>':o.status==='delivering'?'<button class="btn btn-success btn-sm" onclick="completeTakeout('+o.id+')">送达</button>':'-')+'</td></tr>').join('') || '<tr><td colspan="9" style="text-align:center;color:#999;">暂无订单</td></tr>';
+        }
+        async function acceptTakeout(id){await api('/api/canteen/takeout-orders/'+id+'/accept',{method:'PUT'});showToast('已接单','success');loadTakeoutOrders();}
+        async function deliverTakeout(id){await api('/api/canteen/takeout-orders/'+id+'/deliver',{method:'PUT'});showToast('配送中','success');loadTakeoutOrders();}
+        async function completeTakeout(id){await api('/api/canteen/takeout-orders/'+id+'/complete',{method:'PUT'});showToast('已送达','success');loadTakeoutOrders();}
+
         // ========== 物业缴费 ==========
         async function loadPropertyStats() {
             const s = await loadStats();

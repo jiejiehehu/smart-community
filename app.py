@@ -53,6 +53,79 @@ def init_db():
         )
     ''')
     
+    # ========== 包房管理 ==========
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS canteen_rooms (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_name TEXT NOT NULL,
+            capacity INTEGER NOT NULL,
+            price REAL DEFAULT 0,
+            description TEXT,
+            status TEXT DEFAULT 'available',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS room_reservations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_id INTEGER,
+            customer_name TEXT NOT NULL,
+            customer_phone TEXT NOT NULL,
+            guest_count INTEGER NOT NULL,
+            reserve_date TEXT NOT NULL,
+            reserve_time TEXT,
+            purpose TEXT,
+            status TEXT DEFAULT 'pending',
+            admin_remark TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # ========== 套餐档位 ==========
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS canteen_meal_sets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tier_name TEXT NOT NULL,
+            tier_label TEXT NOT NULL,
+            price REAL NOT NULL,
+            description TEXT,
+            status TEXT DEFAULT 'active',
+            sort INTEGER DEFAULT 10,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS meal_set_menus (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tier_id INTEGER,
+            week_start TEXT,
+            week_end TEXT,
+            dishes TEXT,
+            image_url TEXT,
+            status TEXT DEFAULT 'active',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # ========== 外卖送餐 ==========
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS takeout_orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_no TEXT NOT NULL,
+            customer_name TEXT NOT NULL,
+            customer_phone TEXT NOT NULL,
+            delivery_address TEXT NOT NULL,
+            dishes TEXT,
+            amount REAL DEFAULT 0,
+            reserve_date TEXT,
+            reserve_time TEXT,
+            status TEXT DEFAULT 'pending',
+            delivered_at TEXT,
+            remark TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS service_staff (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -750,6 +823,54 @@ def init_mock_data(conn):
             INSERT INTO ingredients (name, category, unit, stock, min_stock, price, supplier, expire_date, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', ing)
+    
+    # ========== 包房管理模拟数据 ==========
+    cursor.execute("SELECT COUNT(*) FROM canteen_rooms")
+    if cursor.fetchone()[0] == 0:
+        rooms_data = [
+            ('芙蓉厅', 10, 200, '中式风格，独立空调', 'available'),
+            ('牡丹厅', 10, 200, '欧式装修，落地窗', 'available'),
+            ('翠竹厅', 10, 200, '田园风格，环境雅致', 'available'),
+            ('兰亭厅', 10, 200, '古典风格，屏风隔断', 'available'),
+            ('荷韵厅', 10, 200, '现代简约，投影设备', 'available'),
+            ('宴会大厅', 20, 500, '可容纳12-20人，舞台灯光音响', 'available'),
+        ]
+        for r in rooms_data:
+            cursor.execute('INSERT INTO canteen_rooms (room_name, capacity, price, description, status) VALUES (?,?,?,?,?)', r)
+        # 模拟几条预订
+        cursor.execute('''INSERT INTO room_reservations (room_id, customer_name, customer_phone, guest_count, reserve_date, reserve_time, purpose, status)
+            VALUES (1,'张先生','138****5678',8,'2026-06-10','18:00','家庭聚餐','pending')''')
+        cursor.execute('''INSERT INTO room_reservations (room_id, customer_name, customer_phone, guest_count, reserve_date, reserve_time, purpose, status)
+            VALUES (2,'李女士','139****1234',10,'2026-06-08','12:00','商务宴请','confirmed')''')
+    
+    # ========== 套餐档位模拟数据 ==========
+    cursor.execute("SELECT COUNT(*) FROM canteen_meal_sets")
+    if cursor.fetchone()[0] == 0:
+        tiers = [
+            ('经济型', '15元档', 15, '一荤一素+米饭', 1),
+            ('标准型', '20元档', 20, '两荤一素+米饭+汤', 2),
+            ('营养型', '25元档', 25, '两荤两素+米饭+汤+水果', 3),
+            ('品质型', '30元档', 30, '三荤两素+米饭+炖汤+水果', 4),
+            ('尊享型', '40元档', 40, '三荤三素+米饭+炖汤+水果+饮品', 5),
+        ]
+        for t in tiers:
+            cursor.execute('INSERT INTO canteen_meal_sets (tier_name, tier_label, price, description, sort) VALUES (?,?,?,?,?)', t)
+        # 本周菜单
+        from datetime import date, timedelta
+        today = date.today()
+        week_start = (today - timedelta(days=today.weekday())).strftime('%Y-%m-%d')
+        week_end = (today + timedelta(days=6-today.weekday())).strftime('%Y-%m-%d')
+        menus = [
+            (1, '红烧肉+蒜蓉青菜+米饭', None),
+            (2, '宫保鸡丁+鱼香肉丝+清炒时蔬+米饭+紫菜汤', None),
+            (3, '糖醋排骨+红烧鱼块+番茄炒蛋+西兰花+米饭+排骨汤+苹果', None),
+            (4, '东坡肉+清蒸鲈鱼+地三鲜+上汤娃娃菜+蒜蓉生菜+米饭+乌鸡汤+橙子', None),
+            (5, '牛排+大虾+红烧狮子头+凉拌黄瓜+干煸四季豆+蚝油生菜+米饭+花胶汤+水果拼盘+酸奶', None),
+        ]
+        for m in menus:
+            cursor.execute('INSERT INTO meal_set_menus (tier_id, week_start, week_end, dishes) VALUES (?,?,?,?)', (m[0], week_start, week_end, m[1]))
+    
+    conn.commit()
     
     # ============ 物业缴费模拟数据 ============
     fee_types = ['物业费', '水费', '电费', '燃气费', '停车费', '垃圾清运费']
@@ -2643,7 +2764,192 @@ def get_stats_snapshot():
             'timestamp': datetime.now().isoformat()
         }
     })
-    
+
+# ============ 包房管理 API ============
+
+@app.route('/api/canteen/rooms', methods=['GET'])
+def get_canteen_rooms():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM canteen_rooms ORDER BY id ASC')
+    rooms = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'code': 0, 'data': rooms})
+
+@app.route('/api/canteen/rooms/<int:room_id>', methods=['PUT'])
+def update_canteen_room(room_id):
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE canteen_rooms SET price=?, description=?, status=? WHERE id=?',
+        (data.get('price',0), data.get('description',''), data.get('status','available'), room_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '更新成功'})
+
+# ============ 包房预订 API ============
+
+@app.route('/api/canteen/room-reservations', methods=['GET'])
+def get_room_reservations():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''SELECT rv.*, cr.room_name FROM room_reservations rv 
+        LEFT JOIN canteen_rooms cr ON rv.room_id = cr.id ORDER BY rv.created_at DESC''')
+    reservations = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'code': 0, 'data': reservations})
+
+@app.route('/api/canteen/room-reservations', methods=['POST'])
+def create_room_reservation():
+    data = request.json
+    if not data.get('customer_name') or not data.get('customer_phone') or not data.get('guest_count'):
+        return jsonify({'code': 1, 'message': '姓名、电话、用餐人数为必填'})
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''INSERT INTO room_reservations 
+        (room_id, customer_name, customer_phone, guest_count, reserve_date, reserve_time, purpose, status)
+        VALUES (?,?,?,?,?,?,?,'pending')''',
+        (data.get('room_id'), data.get('customer_name'), data.get('customer_phone'),
+         data.get('guest_count'), data.get('reserve_date'), data.get('reserve_time'), data.get('purpose')))
+    conn.commit()
+    rid = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '预订已提交，等待审核', 'data': {'id': rid}})
+
+@app.route('/api/canteen/room-reservations/<int:res_id>/confirm', methods=['PUT'])
+def confirm_room_reservation(res_id):
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE room_reservations SET status=?, admin_remark=? WHERE id=?',
+        ('confirmed', data.get('admin_remark',''), res_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '已确认预订'})
+
+@app.route('/api/canteen/room-reservations/<int:res_id>/cancel', methods=['PUT'])
+def cancel_room_reservation(res_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE room_reservations SET status=? WHERE id=?', ('cancelled', res_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '已取消预订'})
+
+# ============ 套餐档位 API ============
+
+@app.route('/api/canteen/meal-sets', methods=['GET'])
+def get_meal_sets():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM canteen_meal_sets WHERE status="active" ORDER BY sort ASC')
+    sets = [dict(row) for row in cursor.fetchall()]
+    # 加载本周菜单
+    cursor.execute("SELECT * FROM meal_set_menus WHERE status='active'")
+    menus = [dict(row) for row in cursor.fetchall()]
+    for s in sets:
+        s['menus'] = [m for m in menus if m['tier_id'] == s['id']]
+    conn.close()
+    return jsonify({'code': 0, 'data': sets})
+
+@app.route('/api/canteen/meal-sets', methods=['POST'])
+def create_meal_set():
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO canteen_meal_sets (tier_name, tier_label, price, description, sort) VALUES (?,?,?,?,?)',
+        (data.get('tier_name'), data.get('tier_label'), data.get('price'), data.get('description'), data.get('sort',10)))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '添加成功'})
+
+@app.route('/api/canteen/meal-sets/<int:set_id>', methods=['PUT'])
+def update_meal_set(set_id):
+    data = request.json
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE canteen_meal_sets SET tier_name=?, tier_label=?, price=?, description=?, sort=? WHERE id=?',
+        (data.get('tier_name'), data.get('tier_label'), data.get('price'), data.get('description'), data.get('sort',10), set_id))
+    conn.commit()
+    # 更新本周菜单
+    if data.get('dishes'):
+        from datetime import date, timedelta
+        today = date.today()
+        ws = (today - timedelta(days=today.weekday())).strftime('%Y-%m-%d')
+        we = (today + timedelta(days=6-today.weekday())).strftime('%Y-%m-%d')
+        cursor.execute("DELETE FROM meal_set_menus WHERE tier_id=? AND week_start=? AND week_end=?", (set_id, ws, we))
+        cursor.execute('INSERT INTO meal_set_menus (tier_id, week_start, week_end, dishes) VALUES (?,?,?,?)', (set_id, ws, we, data.get('dishes')))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '更新成功'})
+
+@app.route('/api/canteen/meal-sets/<int:set_id>', methods=['DELETE'])
+def delete_meal_set(set_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE canteen_meal_sets SET status='inactive' WHERE id=?", (set_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '已下架'})
+
+# ============ 外卖送餐 API ============
+
+@app.route('/api/canteen/takeout-orders', methods=['GET'])
+def get_takeout_orders():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM takeout_orders ORDER BY created_at DESC')
+    orders = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'code': 0, 'data': orders})
+
+@app.route('/api/canteen/takeout-orders', methods=['POST'])
+def create_takeout_order():
+    data = request.json
+    if not data.get('customer_name') or not data.get('customer_phone') or not data.get('delivery_address'):
+        return jsonify({'code': 1, 'message': '姓名、电话、地址为必填'})
+    conn = get_db()
+    cursor = conn.cursor()
+    import random
+    order_no = 'WM' + data.get('customer_phone','')[-4:] + str(random.randint(10,99))
+    cursor.execute('''INSERT INTO takeout_orders 
+        (order_no, customer_name, customer_phone, delivery_address, dishes, amount, reserve_date, reserve_time, status, remark)
+        VALUES (?,?,?,?,?,?,?,?,'pending',?)''',
+        (order_no, data.get('customer_name'), data.get('customer_phone'), data.get('delivery_address'),
+         data.get('dishes'), data.get('amount',0), data.get('reserve_date'), data.get('reserve_time'), data.get('remark','')))
+    conn.commit()
+    oid = cursor.lastrowid
+    conn.close()
+    return jsonify({'code': 0, 'message': '下单成功', 'data': {'id': oid, 'order_no': order_no}})
+
+@app.route('/api/canteen/takeout-orders/<int:order_id>/accept', methods=['PUT'])
+def accept_takeout_order(order_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE takeout_orders SET status='accepted' WHERE id=? AND status='pending'", (order_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '已接单'})
+
+@app.route('/api/canteen/takeout-orders/<int:order_id>/deliver', methods=['PUT'])
+def deliver_takeout_order(order_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE takeout_orders SET status='delivering' WHERE id=? AND status='accepted'", (order_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '配送中'})
+
+@app.route('/api/canteen/takeout-orders/<int:order_id>/complete', methods=['PUT'])
+def complete_takeout_order(order_id):
+    now = datetime.now().strftime('%Y-%m-%d %H:%M')
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE takeout_orders SET status='completed', delivered_at=? WHERE id=? AND status='delivering'", (now, order_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'code': 0, 'message': '已送达'})
+
 # ============ 社区医生管理模块 API ============
 
 @app.route('/api/community/doctors', methods=['GET'])
