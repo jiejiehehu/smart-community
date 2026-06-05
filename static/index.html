@@ -2333,38 +2333,6 @@
     <!-- Toast提示 -->
     <div id="toast" class="toast" style="display:none;"></div>
     
-    <!-- 演示引导弹窗 -->
-    <div class="guide-modal" id="guideModal">
-        <div class="guide-content">
-            <div class="guide-header">
-                <h2>🏠 智慧社区物业管理平台</h2>
-                <p>欢迎体验完整的智慧社区管理演示系统</p>
-            </div>
-            <div class="guide-body">
-                <div class="guide-steps">
-                    <div class="guide-step">
-                        <div class="guide-step-num">1</div>
-                        <div class="guide-step-text">点击左侧菜单，浏览11大功能模块</div>
-                    </div>
-                    <div class="guide-step">
-                        <div class="guide-step-num">2</div>
-                        <div class="guide-step-text">查看「数据看板」了解社区运营概况</div>
-                    </div>
-                    <div class="guide-step">
-                        <div class="guide-step-num">3</div>
-                        <div class="guide-step-text">体验「家政服务」「食堂订餐」等业务流程</div>
-                    </div>
-                    <div class="guide-step">
-                        <div class="guide-step-num">4</div>
-                        <div class="guide-step-text">点击右上角「居民端预览」切换到H5居民端</div>
-                    </div>
-                </div>
-            </div>
-            <div class="guide-footer">
-                <button class="btn btn-primary" id="guideCloseBtn" onclick="window.closeGuide()" style="padding: 10px 32px; font-size: 15px; cursor: pointer;">开始演示</button>
-            </div>
-        </div>
-    </div>
     
     <!-- 演示帮助面板 -->
     <div class="help-panel" id="helpPanel">
@@ -2401,13 +2369,6 @@
     <div class="help-btn" onclick="toggleHelpPanel()" title="演示帮助">❓</div>
     
     <script>
-        // 引导弹窗关闭函数（提前定义，确保 onclick 可访问）
-        window.closeGuide = function() {
-            var modal = document.getElementById('guideModal');
-            if (modal) modal.style.display = 'none';
-            localStorage.setItem('smartCommunityGuideShown', 'true');
-        };
-
         const API_BASE = '';
         let currentServiceType = 'cleaning';
         let staffList = [];
@@ -2429,10 +2390,6 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             showPage('dashboard-home');
-            // 首次访问显示引导
-            if (!localStorage.getItem('smartCommunityGuideShown')) {
-                document.getElementById('guideModal').style.display = 'flex';
-            }
         });
         
         // ========== 演示引导功能 ==========
